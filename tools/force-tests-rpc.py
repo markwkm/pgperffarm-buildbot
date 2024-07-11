@@ -27,6 +27,12 @@ parser.add_argument(
         help='Buildbot URL',
         )
 parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        default=False,
+        help='do not actually submit a build request',
+        )
+parser.add_argument(
         '--limit',
         type=int,
         default=20,
@@ -112,6 +118,8 @@ for branch in args.branch:
                         }
 
                 for worker in args.worker:
+                    if args.dry_run:
+                        break
                     r = s.post(
                             f"{args.buildbot}/api/v2/forceschedulers/run-dbt2-{worker}" ,
                             data=json.dumps(data), headers=headers)
@@ -131,6 +139,8 @@ for branch in args.branch:
                         }
 
                 for worker in args.worker:
+                    if args.dry_run:
+                        break
                     r = s.post(
                             f"{args.buildbot}/api/v2/forceschedulers/run-dbt3-{worker}" ,
                             data=json.dumps(data), headers=headers)
@@ -149,6 +159,8 @@ for branch in args.branch:
                         }
 
                 for worker in args.worker:
+                    if args.dry_run:
+                        break
                     r = s.post(
                             f"{args.buildbot}/api/v2/forceschedulers/run-dbt5-{worker}" ,
                             data=json.dumps(data), headers=headers)
@@ -168,6 +180,8 @@ for branch in args.branch:
                         }
 
                 for worker in args.worker:
+                    if args.dry_run:
+                        break
                     r = s.post(
                             f"{args.buildbot}/api/v2/forceschedulers/run-dbt7-{worker}" ,
                             data=json.dumps(data), headers=headers)
