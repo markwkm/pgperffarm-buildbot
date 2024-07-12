@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import subprocess
@@ -37,6 +37,12 @@ parser.add_argument(
         type=int,
         default=20,
         help='limit the number of commits to queue for testing',
+        )
+parser.add_argument(
+        '--only-missing',
+        action='store_true',
+        default=False,
+        help='queue test only if commit has not been tested yet',
         )
 parser.add_argument(
         '--test',
@@ -100,8 +106,14 @@ for branch in args.branch:
     with subprocess.Popen(command, stdout=subprocess.PIPE, text=True) as pipe:
         for line in pipe.stdout:
             commit = line.strip().strip('"')
+
             if args.verbose:
-                print(f"{count}: queueing commit {commit}")
+                pcmd = ['git', 'log', '-1', '--pretty=format:"%s - %aD"',
+                        '--date=format:"%Y-%m-%d"', commit]
+                r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
+                message = r.stdout.strip().strip('"')
+
+                print(f'{count}: commit {commit} {message}')
 
             # dbt2
             if not args.test or 'dbt2' in args.test:
@@ -118,11 +130,51 @@ for branch in args.branch:
                         }
 
                 for worker in args.worker:
-                    if args.dry_run:
-                        break
-                    r = s.post(
-                            f"{args.buildbot}/api/v2/forceschedulers/run-dbt2-{worker}" ,
-                            data=json.dumps(data), headers=headers)
+                    if args.only_missing:
+                        query = f"""
+                                SELECT 1
+                                  FROM builds
+                                       JOIN build_properties AS revision
+                                         ON revision.buildid = builds.id
+                                        AND revision.name = 'revision'
+                                       JOIN build_properties AS got_revision
+                                         ON got_revision.buildid = builds.id
+                                        AND got_revision.name = 'got_revision'
+                                       JOIN builders
+                                         ON builderid = builders.id
+                                       JOIN workers
+                                         ON workerid = workers.id
+                                        AND workers.name = '{worker}'
+                                  WHERE builds.results = 0
+                                    AND (
+                                            builders.name = 'dbt2'
+                                         OR builders.name LIKE 'dbt2-%'
+                                        )
+                                    AND (
+                                            revision.value = '"{commit}"'
+                                         OR got_revision.value = '"{commit}"'
+                                        )
+                                """
+                        pcmd = ['psql', '-XAt', '-d', 'perffarm', '-c', query]
+                        r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
+                        found = r.stdout.strip()
+
+                        if found == '1':
+                            if args.verbose:
+                                print(f'  dbt2: {worker} exists')
+                        else:
+                            found = '0'
+                            if args.verbose:
+                                print(f'  dbt2: {worker} missed')
+                    else:
+                        found = '0'
+                        if args.verbose:
+                            print(f'  dbt2: {worker} queue')
+
+                    if not args.dry_run and found == '0':
+                        r = s.post(
+                                f"{args.buildbot}/api/v2/forceschedulers/run-dbt2-{worker}" ,
+                                data=json.dumps(data), headers=headers)
 
             # dbt3
             if not args.test or 'dbt3' in args.test:
@@ -139,11 +191,51 @@ for branch in args.branch:
                         }
 
                 for worker in args.worker:
-                    if args.dry_run:
-                        break
-                    r = s.post(
-                            f"{args.buildbot}/api/v2/forceschedulers/run-dbt3-{worker}" ,
-                            data=json.dumps(data), headers=headers)
+                    if args.only_missing:
+                        query = f"""
+                                SELECT 1
+                                  FROM builds
+                                       JOIN build_properties AS revision
+                                         ON revision.buildid = builds.id
+                                        AND revision.name = 'revision'
+                                       JOIN build_properties AS got_revision
+                                         ON got_revision.buildid = builds.id
+                                        AND got_revision.name = 'got_revision'
+                                       JOIN builders
+                                         ON builderid = builders.id
+                                       JOIN workers
+                                         ON workerid = workers.id
+                                        AND workers.name = '{worker}'
+                                  WHERE builds.results = 0
+                                    AND (
+                                            builders.name = 'dbt3'
+                                         OR builders.name LIKE 'dbt3-%'
+                                        )
+                                    AND (
+                                            revision.value = '"{commit}"'
+                                         OR got_revision.value = '"{commit}"'
+                                        )
+                                """
+                        pcmd = ['psql', '-XAt', '-d', 'perffarm', '-c', query]
+                        r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
+                        found = r.stdout.strip()
+
+                        if found == '1':
+                            if args.verbose:
+                                print(f'  dbt3: {worker} exists')
+                        else:
+                            found = '0'
+                            if args.verbose:
+                                print(f'  dbt3: {worker} missed')
+                    else:
+                        found = '0'
+                        if args.verbose:
+                            print(f'  dbt3: {worker} queue')
+
+                    if not args.dry_run and found == '0':
+                        r = s.post(
+                                f"{args.buildbot}/api/v2/forceschedulers/run-dbt3-{worker}" ,
+                                data=json.dumps(data), headers=headers)
 
             # dbt5
             if not args.test or 'dbt5' in args.test:
@@ -159,11 +251,51 @@ for branch in args.branch:
                         }
 
                 for worker in args.worker:
-                    if args.dry_run:
-                        break
-                    r = s.post(
-                            f"{args.buildbot}/api/v2/forceschedulers/run-dbt5-{worker}" ,
-                            data=json.dumps(data), headers=headers)
+                    if args.only_missing:
+                        query = f"""
+                                SELECT 1
+                                  FROM builds
+                                       JOIN build_properties AS revision
+                                         ON revision.buildid = builds.id
+                                        AND revision.name = 'revision'
+                                       JOIN build_properties AS got_revision
+                                         ON got_revision.buildid = builds.id
+                                        AND got_revision.name = 'got_revision'
+                                       JOIN builders
+                                         ON builderid = builders.id
+                                       JOIN workers
+                                         ON workerid = workers.id
+                                        AND workers.name = '{worker}'
+                                  WHERE builds.results = 0
+                                    AND (
+                                            builders.name = 'dbt5'
+                                         OR builders.name LIKE 'dbt5-%'
+                                        )
+                                    AND (
+                                            revision.value = '"{commit}"'
+                                         OR got_revision.value = '"{commit}"'
+                                        )
+                                """
+                        pcmd = ['psql', '-XAt', '-d', 'perffarm', '-c', query]
+                        r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
+                        found = r.stdout.strip()
+
+                        if found == '1':
+                            if args.verbose:
+                                print(f'  dbt5: {worker} exists')
+                        else:
+                            found = '0'
+                            if args.verbose:
+                                print(f'  dbt5: {worker} missed')
+                    else:
+                        found = '0'
+                        if args.verbose:
+                            print(f'  dbt5: {worker} queue')
+
+                    if not args.dry_run and found == '0':
+                        r = s.post(
+                                f"{args.buildbot}/api/v2/forceschedulers/run-dbt5-{worker}" ,
+                                data=json.dumps(data), headers=headers)
 
             # dbt7
             if not args.test or 'dbt7' in args.test:
@@ -180,11 +312,51 @@ for branch in args.branch:
                         }
 
                 for worker in args.worker:
-                    if args.dry_run:
-                        break
-                    r = s.post(
-                            f"{args.buildbot}/api/v2/forceschedulers/run-dbt7-{worker}" ,
-                            data=json.dumps(data), headers=headers)
+                    if args.only_missing:
+                        query = f"""
+                                SELECT 1
+                                  FROM builds
+                                       JOIN build_properties AS revision
+                                         ON revision.buildid = builds.id
+                                        AND revision.name = 'revision'
+                                       JOIN build_properties AS got_revision
+                                         ON got_revision.buildid = builds.id
+                                        AND got_revision.name = 'got_revision'
+                                       JOIN builders
+                                         ON builderid = builders.id
+                                       JOIN workers
+                                         ON workerid = workers.id
+                                        AND workers.name = '{worker}'
+                                  WHERE builds.results = 0
+                                    AND (
+                                            builders.name = 'dbt7'
+                                         OR builders.name LIKE 'dbt7-%'
+                                        )
+                                    AND (
+                                            revision.value = '"{commit}"'
+                                         OR got_revision.value = '"{commit}"'
+                                        )
+                                """
+                        pcmd = ['psql', '-XAt', '-d', 'perffarm', '-c', query]
+                        r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
+                        found = r.stdout.strip()
+
+                        if found == '1':
+                            if args.verbose:
+                                print(f'  dbt7: {worker} exists')
+                        else:
+                            found = '0'
+                            if args.verbose:
+                                print(f'  dbt7: {worker} missed')
+                    else:
+                        found = '0'
+                        if args.verbose:
+                            print(f'  dbt7: {worker} queue')
+
+                    if not args.dry_run and found == '0':
+                        r = s.post(
+                                f"{args.buildbot}/api/v2/forceschedulers/run-dbt7-{worker}" ,
+                                data=json.dumps(data), headers=headers)
 
             count = count + 1
             if args.limit != 0 and count > args.limit:
