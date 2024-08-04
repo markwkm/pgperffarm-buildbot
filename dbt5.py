@@ -115,17 +115,10 @@ DBT5STEPS = general.CLEANUP + \
             haltOnFailure=True,
             )] + \
         [steps.ShellCommand(
-            name="(hack) drop pl/pgsql functions",
-            command=[
-                'psql',
-                '-X',
-                '-d', 'dbt5',
-                '-f', util.Interpolate(
-                    "%(prop:builddir)s/dbt5/storedproc/pgsql/pgsql/drop_all_functions.sql"),
-                ],
-            env={
-                'PATH': util.Interpolate("%(prop:builddir)s/usr/bin:${PATH}"),
-                },
+            name="drop pl/pgsql functions",
+            command=['dbt5', 'pgsql-drop-stored-procs', '-d', 'dbt5'],
+            env={'PATH': util.Interpolate(
+                "%(prop:builddir)s/usr/bin:${PATH}")},
             haltOnFailure=True,
             )] + \
         [steps.ShellCommand(
