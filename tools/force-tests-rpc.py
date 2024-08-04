@@ -102,8 +102,8 @@ for branch in args.branch:
         command = ['git', 'log', branch, '^master', '--pretty=format:"%H"',
                    '--', 'src']
 
-    count = 1
     with subprocess.Popen(command, stdout=subprocess.PIPE, text=True) as pipe:
+        count = 1
         for line in pipe.stdout:
             commit = line.strip().strip('"')
 
@@ -360,4 +360,4 @@ for branch in args.branch:
 
             count = count + 1
             if args.limit != 0 and count > args.limit:
-                sys.exit(0)
+                break
