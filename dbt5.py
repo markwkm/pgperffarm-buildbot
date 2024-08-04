@@ -175,7 +175,7 @@ DBT5STEPS = general.CLEANUP + \
                     "--tpcetools=%(prop:builddir)s/../egen "
                     "-c %(prop:customers)s "
                     "-d %(prop:duration)s "
-                    "-s %(prop:connection_delay)s "
+                    "-s $(( %(prop:connection_delay)s * 1000 )) "
                     "-t %(prop:customers)s "
                     "-u %(prop:users)s "
                     "pgsql %(prop:builddir)s/results"
