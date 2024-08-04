@@ -108,6 +108,7 @@ DBT5STEPS = general.CLEANUP + \
             env={
                 'APPDIR': util.Interpolate("%(prop:builddir)s"),
                 'PATH': util.Interpolate("%(prop:builddir)s/usr/bin:${PATH}"),
+                'PGDATABASE': 'postgres',
                 },
             workdir='load',
             timeout=None,
