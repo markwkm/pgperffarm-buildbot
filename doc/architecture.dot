@@ -1,0 +1,26 @@
+digraph g {
+    rankdir=LR;
+    node [shape=box];
+    graph [dpi=300];
+
+    subgraph {
+        Buildbot [label="Buildbot"];
+        DB [label="Results Database\n(PostgreSQL)"];
+        Repo [label="PostgreSQL Git Repository"];
+        Worker1 [label="Plant\n(Buildbot Worker 1)"];
+        Worker2 [label="Plant\n(Buildbot Worker ...)"];
+        Worker3 [label="Plant\n(Buildbot Worker N)"];
+        WUI [label="Reporting WUI\n(Custom)"];
+
+        Worker1 -> Buildbot [label="buildbot worker protocol"];
+        Worker2 -> Buildbot [label="buildbot worker protocol"];
+        Worker3 -> Buildbot [label="buildbot worker protocol"];
+        WUI -> Buildbot [label="https"];
+        WUI -> DB;
+        Buildbot -> DB;
+        Buildbot -> Repo [label="https"];
+
+        { rank = same; Worker1; Worker2; Worker3; }
+        { rank = same; WUI; Buildbot; Repo }
+    }
+}
