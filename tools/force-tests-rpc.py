@@ -45,6 +45,10 @@ parser.add_argument(
         help='queue test only if commit has not been tested yet',
         )
 parser.add_argument(
+        '--revision',
+        help='git commit revision to start at',
+        )
+parser.add_argument(
         '--test',
         action='append',
         default=[],
@@ -96,11 +100,18 @@ for branch in args.branch:
     if args.verbose:
         print(f"queueing for branch {branch}")
 
-    if branch == "master":
-        command = ['git', 'log', 'master', '--pretty=format:"%H"', '--', 'src']
-    else:
-        command = ['git', 'log', branch, '^master', '--pretty=format:"%H"',
-                   '--', 'src']
+    command = ['git', 'checkout', branch]
+    subprocess.run(command, stdout=subprocess.PIPE, text=True)
+    command = ['git', 'pull']
+    subprocess.run(command, stdout=subprocess.PIPE, text=True)
+
+    command = ['git', 'log']
+    if args.limit:
+        command.append(f'-{args.limit}')
+    command.append('--pretty=format:"%H"')
+    if args.revision:
+        command.append(args.revision)
+    command.extend(['--', 'src'])
 
     with subprocess.Popen(command, stdout=subprocess.PIPE, text=True) as pipe:
         count = 1
