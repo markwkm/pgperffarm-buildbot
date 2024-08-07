@@ -74,7 +74,8 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-secret = getpass.getpass('secret: ')
+if not args.dry_run:
+    secret = getpass.getpass('secret: ')
 
 headers = {'Content-Type': 'application/json'}
 data = {
@@ -84,7 +85,8 @@ data = {
         }
 
 s = requests.Session()
-r = s.get(f"{args.buildbot}/auth/login", auth=(args.user, secret))
+if not args.dry_run:
+    r = s.get(f"{args.buildbot}/auth/login", auth=(args.user, secret))
 
 if not args.worker:
     r = requests.get(f"{args.buildbot}/api/v2/workers")
