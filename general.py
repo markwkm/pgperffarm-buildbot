@@ -80,8 +80,23 @@ CATPREFIX = "cat %(prop:builddir)s/results/throughput/sysstat"
 STATS_DSS = [
         steps.ShellCommand(
             name="pidstat",
-            command=['sh', '-c', util.Interpolate(f"{CATPREFIX}/pidstat.txt")],
+            command=[
+                'sh',
+                '-c',
+                util.Interpolate(f"{CATPREFIX}/pidstat.txt || exit 0"),
+                ],
             alwaysRun=True,
+            warnOnFailure=True,
+            ),
+        steps.ShellCommand(
+            name="spar",
+            command=[
+                'sh',
+                '-c',
+                util.Interpolate(f"{CATPREFIX}/spar.txt || exit 0"),
+                ],
+            alwaysRun=True,
+            warnOnFailure=True,
             ),
         steps.ShellCommand(
             name="Bock Device Stats",
@@ -133,8 +148,23 @@ CATPREFIX = "cat %(prop:builddir)s/results/db/*/sysstat"
 STATS_OLTP = [
         steps.ShellCommand(
             name="pidstat",
-            command=['sh', '-c', util.Interpolate(f"{CATPREFIX}/pidstat.txt")],
+            command=[
+                'sh',
+                '-c',
+                util.Interpolate(f"{CATPREFIX}/pidstat.txt || exit 0"),
+                ],
             alwaysRun=True,
+            warnOnFailure=True,
+            ),
+        steps.ShellCommand(
+            name="spar",
+            command=[
+                'sh',
+                '-c',
+                util.Interpolate(f"{CATPREFIX}/spar.txt || exit 0"),
+                ],
+            alwaysRun=True,
+            warnOnFailure=True,
             ),
         steps.ShellCommand(
             name="Bock Device Stats",
