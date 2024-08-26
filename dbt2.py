@@ -12,6 +12,7 @@ CMD = "%(prop:builddir)s/../test/dbt2.conf | tail -n 1 | cut -d '=' -f 2"
 CONN_PER_PROC = f"$(( ($(grep -i ^connections {CMD}) - 1) / $(nproc) + 1 ))"
 CONNECTIONS = f"$(grep -i ^connections {CMD})"
 DURATION = f"$(grep -i ^duration {CMD})"
+PARALLELISM = f"$(grep -i ^parallelism {CMD})"
 RAMPUP = f"$(( ($(grep -i ^rampup {CMD}) / {CONNECTIONS} + 1) * 1000 ))"
 WAREHOUSES = f"$(grep -i ^warehouses {CMD})"
 
@@ -38,6 +39,12 @@ DBT2PROPERTIES = [
             name="connections_per_processor",
             label="Connections opened per processor",
             default=1,
+            required=True,
+            ),
+        util.IntParameter(
+            name="parallelism",
+            label="Limit data loading parallelism",
+            default=20,
             required=True,
             ),
         util.IntParameter(
@@ -114,7 +121,11 @@ DBT2STEPS = general.CLEANUP + \
             doStepIf=general.IsNotForceScheduler,
             command=[
                 '/bin/sh', '-c',
-                util.Interpolate(f"dbt2 build -w {WAREHOUSES} pgsql"),
+                util.Interpolate(
+                    f"dbt2 build -w {WAREHOUSES} "
+                    f"--parallelism {PARALLELISM} "
+                    f"pgsql"
+                    ),
                 ],
             env={
                 'APPDIR': util.Interpolate("%(prop:builddir)s"),
@@ -129,7 +140,11 @@ DBT2STEPS = general.CLEANUP + \
             doStepIf=general.IsForceScheduler,
             command=[
                 '/bin/sh', '-c',
-                util.Interpolate("dbt2 build -w %(prop:warehouses)s pgsql"),
+                util.Interpolate(
+                    "dbt2 build -w %(prop:warehouses)s "
+                    "--parallelism=%(prop:parallelism)s "
+                    "pgsql"
+                    ),
                 ],
             env={
                 'APPDIR': util.Interpolate("%(prop:builddir)s"),
