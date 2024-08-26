@@ -94,13 +94,35 @@ DBT5STEPS = general.CLEANUP + \
         postgres.PGSTART + \
         [steps.ShellCommand(
             name="Build database",
+            doStepIf=general.IsNotForceScheduler,
             command=[
                 '/bin/sh', '-c',
                 util.Interpolate(
                     "dbt5 build "
                     "-l CUSTOM "
-                    f"-c {CUSTOMERS} "
                     f"-t {CUSTOMERS} "
+                    "--tpcetools=%(prop:builddir)s/../egen "
+                    "pgsql"
+                    ),
+                ],
+            env={
+                'APPDIR': util.Interpolate("%(prop:builddir)s"),
+                'PATH': util.Interpolate("%(prop:builddir)s/usr/bin:${PATH}"),
+                'PGDATABASE': 'postgres',
+                },
+            workdir='load',
+            timeout=None,
+            haltOnFailure=True,
+            )] + \
+        [steps.ShellCommand(
+            name="Build database (force)",
+            doStepIf=general.IsForceScheduler,
+            command=[
+                '/bin/sh', '-c',
+                util.Interpolate(
+                    "dbt5 build "
+                    "-l CUSTOM "
+                    "-t %(prop:customers)s "
                     "--tpcetools=%(prop:builddir)s/../egen "
                     "pgsql"
                     ),
