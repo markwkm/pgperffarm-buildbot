@@ -11,6 +11,7 @@ CMD = "%(prop:builddir)s/../test/dbt5.conf | tail -n 1 | cut -d '=' -f 2"
 
 CUSTOMERS = f"$(grep -i ^customers {CMD})"
 DURATION = f"$(grep -i ^duration {CMD})"
+PARALLELISM = f"$(grep -i ^parallelism {CMD})"
 USERS = f"$(grep -i ^users {CMD})"
 RAMPUP = f"$(( ($(grep -i ^rampup {CMD})  * 1000) / {USERS} ))"
 
@@ -31,6 +32,12 @@ DBT5PROPERTIES = [
             name="connection_delay",
             label="Seconds between starting users",
             default=1,
+            required=True,
+            ),
+        util.IntParameter(
+            name="parallelism",
+            label="Limit data loading parallelism",
+            default=20,
             required=True,
             ),
         util.IntParameter(
@@ -100,6 +107,7 @@ DBT5STEPS = general.CLEANUP + \
                 util.Interpolate(
                     "dbt5 build "
                     "-l CUSTOM "
+                    f"--parallelism {PARALLELISM} "
                     f"-t {CUSTOMERS} "
                     "--tpcetools=%(prop:builddir)s/../egen "
                     "pgsql"
@@ -122,6 +130,7 @@ DBT5STEPS = general.CLEANUP + \
                 util.Interpolate(
                     "dbt5 build "
                     "-l CUSTOM "
+                    "--parallelism=%(prop:parallelism)s "
                     "-t %(prop:customers)s "
                     "--tpcetools=%(prop:builddir)s/../egen "
                     "pgsql"
