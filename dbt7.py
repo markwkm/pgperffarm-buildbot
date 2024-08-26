@@ -9,9 +9,16 @@ import postgres
 
 CMD = "%(prop:builddir)s/../test/dbt7.conf | tail -n 1 | cut -d '=' -f 2"
 
+PARALLELISM = f"$(grep -i ^parallelism {CMD})"
 SCALE = f"$(grep -i ^scale_factor {CMD})"
 
 DBT7PROPERTIES = [
+        util.IntParameter(
+            name="parallelism",
+            label="Limit parallelism for load test",
+            default=20,
+            required=True,
+            ),
         util.IntParameter(
             name="scale",
             label="Scale Factor",
@@ -89,6 +96,7 @@ DBT7STEPS = general.CLEANUP + \
                 util.Interpolate(
                     "dbt7 run "
                     "-d postgresqlea "
+                    f"--parallel {PARALLELISM} "
                     "--stats "
                     "--tpcdstools=%(prop:builddir)s/../dsgen "
                     f"-s {SCALE} "
@@ -109,6 +117,7 @@ DBT7STEPS = general.CLEANUP + \
                 util.Interpolate(
                     "dbt7 run "
                     "-d postgresqlea "
+                    "--parallel=%(prop:parallelism)s "
                     "--stats "
                     "--tpcdstools=%(prop:builddir)s/../dsgen "
                     "-s %(prop:scale)s "
