@@ -9,9 +9,16 @@ import postgres
 
 CMD = "%(prop:builddir)s/../test/dbt3.conf | tail -n 1 | cut -d '=' -f 2"
 
+PARALLELISM = f"$(grep -i ^parallelism {CMD})"
 SCALE = f"$(grep -i ^scale_factor {CMD})"
 
 DBT3PROPERTIES = [
+        util.IntParameter(
+            name="parallelism",
+            label="Parallelism limit for load test",
+            default=20,
+            required=True,
+            ),
         util.IntParameter(
             name="scale",
             label="Scale Factor",
@@ -90,6 +97,7 @@ DBT3STEPS = general.CLEANUP + \
                     "dbt3 run "
                     "--dss=%(prop:builddir)s/dss "
                     "--explain "
+                    f"--parallelism {PARALLELISM} "
                     "--relax "
                     f"--scale-factor {SCALE} "
                     "--stats "
@@ -112,6 +120,7 @@ DBT3STEPS = general.CLEANUP + \
                     "dbt3 run "
                     "--dss=%(prop:builddir)s/dss "
                     "--explain "
+                    "--parallelism=%(prop:parallelism)s "
                     "--relax "
                     "--scale-factor %(prop:scale)s "
                     "--stats "
