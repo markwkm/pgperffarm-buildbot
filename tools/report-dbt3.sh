@@ -11,12 +11,12 @@ psql -X -d perffarm -o "${CSVEXPORT}" << __SQL__
 COPY (
     WITH data AS (
         SELECT workers.name AS plant
-             , btrim(branch.value, '"') AS branch
-             , CASE WHEN revision.value = '""'
-                    THEN btrim(got_revision.value, '"')
-                    ELSE btrim(revision.value, '"')
-                    END AS revision
-             , scale.value AS scale
+             , coalesce(btrim(branch.value, '"'), '') AS branch
+             , coalesce(
+                   btrim(revision.value, '"')
+                 , btrim(got_revision.value, '"')
+               ) AS revision
+             , btrim(scale.value, '"') AS scale
              , log_summary.id AS log_summary_id
              , log_test.id AS log_test_id
              , row_number() OVER (
@@ -32,6 +32,10 @@ COPY (
               AND builds.results = 0
              JOIN builders
                ON builders.id = builderid
+              AND (
+                       builders.name = 'dbt3'
+                    OR builders.name LIKE 'dbt3-%'
+                  )
              JOIN build_properties AS branch
                ON branch.buildid = builds.id
               AND branch.name = 'branch'
@@ -39,6 +43,7 @@ COPY (
              JOIN build_properties AS revision
                ON revision.buildid = builds.id
               AND revision.name = 'revision'
+              AND revision.value <> '""'
              JOIN build_properties AS got_revision
                ON got_revision.buildid = builds.id
               AND got_revision.name = 'got_revision'
@@ -55,8 +60,7 @@ COPY (
               AND step_test.name = 'Performance test'
              LEFT OUTER JOIN logs AS log_test
                ON log_test.stepid = step_test.id
-        WHERE builders.name = 'dbt3'
-          OR builders.name LIKE 'dbt3-%'
+        ORDER BY builds.complete_at DESC
     )
     SELECT plant
          , branch
