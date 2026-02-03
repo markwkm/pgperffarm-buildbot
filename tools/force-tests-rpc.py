@@ -188,6 +188,8 @@ for branch in args.branch:
                         r = s.post(
                                 f"{args.buildbot}/api/v2/forceschedulers/run-dbt2-{worker}" ,
                                 data=json.dumps(data), headers=headers)
+                        if r.status_code < 200 or r.status_code >= 300:
+                            print(r.text)
 
             # dbt3
             if not args.test or 'dbt3' in args.test:
@@ -249,6 +251,8 @@ for branch in args.branch:
                         r = s.post(
                                 f"{args.buildbot}/api/v2/forceschedulers/run-dbt3-{worker}" ,
                                 data=json.dumps(data), headers=headers)
+                        if r.status_code < 200 or r.status_code >= 300:
+                            print(r.text)
 
             # dbt5
             if not args.test or 'dbt5' in args.test:
@@ -309,6 +313,8 @@ for branch in args.branch:
                         r = s.post(
                                 f"{args.buildbot}/api/v2/forceschedulers/run-dbt5-{worker}" ,
                                 data=json.dumps(data), headers=headers)
+                        if r.status_code < 200 or r.status_code >= 300:
+                            print(r.text)
 
             # dbt7
             if not args.test or 'dbt7' in args.test:
@@ -370,6 +376,8 @@ for branch in args.branch:
                         r = s.post(
                                 f"{args.buildbot}/api/v2/forceschedulers/run-dbt7-{worker}" ,
                                 data=json.dumps(data), headers=headers)
+                        if r.status_code < 200 or r.status_code >= 300:
+                            print(r.text)
 
             count = count + 1
             if args.limit != 0 and count > args.limit:
