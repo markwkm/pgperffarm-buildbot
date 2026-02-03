@@ -7,6 +7,42 @@ import getpass
 import json
 import requests
 
+
+def find_test_for_commit(test0, name, revision):
+    """Check if a test has run for a given commit."""
+    query = f"""
+        SELECT 1
+          FROM builds
+               JOIN build_properties AS revision
+                 ON revision.buildid = builds.id
+                AND revision.name = 'revision'
+               JOIN build_properties AS got_revision
+                 ON got_revision.buildid = builds.id
+                AND got_revision.name = 'got_revision'
+               JOIN builders
+                 ON builderid = builders.id
+               JOIN workers
+                 ON workerid = workers.id
+                AND workers.name = '{name}'
+          WHERE builds.results = 0
+            AND (
+                    builders.name = '{test}'
+                 OR builders.name LIKE '{test}-%'
+                )
+            AND (
+                    revision.value = '"{revision}"'
+                 OR got_revision.value = '"{revision}"'
+                )
+    """
+    result = subprocess.run(
+        ['psql', '-XAt', '-d', 'perffarm', '-c', query],
+        stdout=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
+    return result.stdout.strip() == '1'
+
+
 parser = argparse.ArgumentParser(
         description="""
         Queue up performance tests to run.  Must run this script from withing a
@@ -145,47 +181,19 @@ for branch in args.branch:
 
                 for worker in args.worker:
                     if args.only_missing:
-                        query = f"""
-                                SELECT 1
-                                  FROM builds
-                                       JOIN build_properties AS revision
-                                         ON revision.buildid = builds.id
-                                        AND revision.name = 'revision'
-                                       JOIN build_properties AS got_revision
-                                         ON got_revision.buildid = builds.id
-                                        AND got_revision.name = 'got_revision'
-                                       JOIN builders
-                                         ON builderid = builders.id
-                                       JOIN workers
-                                         ON workerid = workers.id
-                                        AND workers.name = '{worker}'
-                                  WHERE builds.results = 0
-                                    AND (
-                                            builders.name = 'dbt2'
-                                         OR builders.name LIKE 'dbt2-%'
-                                        )
-                                    AND (
-                                            revision.value = '"{commit}"'
-                                         OR got_revision.value = '"{commit}"'
-                                        )
-                                """
-                        pcmd = ['psql', '-XAt', '-d', 'perffarm', '-c', query]
-                        r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
-                        found = r.stdout.strip()
-
-                        if found == '1':
+                        found = find_test_for_commit('dbt2', worker, commit)
+                        if found:
                             if args.verbose:
                                 print(f'  dbt2: {worker} exists')
                         else:
-                            found = '0'
                             if args.verbose:
                                 print(f'  dbt2: {worker} missed')
                     else:
-                        found = '0'
+                        found = False
                         if args.verbose:
                             print(f'  dbt2: {worker} queue')
 
-                    if not args.dry_run and found == '0':
+                    if not args.dry_run and not found:
                         r = s.post(
                                 f"{args.buildbot}/api/v2/forceschedulers/run-dbt2-{worker}" ,
                                 data=json.dumps(data), headers=headers)
@@ -209,47 +217,19 @@ for branch in args.branch:
 
                 for worker in args.worker:
                     if args.only_missing:
-                        query = f"""
-                                SELECT 1
-                                  FROM builds
-                                       JOIN build_properties AS revision
-                                         ON revision.buildid = builds.id
-                                        AND revision.name = 'revision'
-                                       JOIN build_properties AS got_revision
-                                         ON got_revision.buildid = builds.id
-                                        AND got_revision.name = 'got_revision'
-                                       JOIN builders
-                                         ON builderid = builders.id
-                                       JOIN workers
-                                         ON workerid = workers.id
-                                        AND workers.name = '{worker}'
-                                  WHERE builds.results = 0
-                                    AND (
-                                            builders.name = 'dbt3'
-                                         OR builders.name LIKE 'dbt3-%'
-                                        )
-                                    AND (
-                                            revision.value = '"{commit}"'
-                                         OR got_revision.value = '"{commit}"'
-                                        )
-                                """
-                        pcmd = ['psql', '-XAt', '-d', 'perffarm', '-c', query]
-                        r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
-                        found = r.stdout.strip()
-
-                        if found == '1':
+                        found = find_test_for_commit('dbt3', worker, commit)
+                        if found:
                             if args.verbose:
                                 print(f'  dbt3: {worker} exists')
                         else:
-                            found = '0'
                             if args.verbose:
                                 print(f'  dbt3: {worker} missed')
                     else:
-                        found = '0'
+                        found = False
                         if args.verbose:
                             print(f'  dbt3: {worker} queue')
 
-                    if not args.dry_run and found == '0':
+                    if not args.dry_run and not found:
                         r = s.post(
                                 f"{args.buildbot}/api/v2/forceschedulers/run-dbt3-{worker}" ,
                                 data=json.dumps(data), headers=headers)
@@ -272,47 +252,19 @@ for branch in args.branch:
 
                 for worker in args.worker:
                     if args.only_missing:
-                        query = f"""
-                                SELECT 1
-                                  FROM builds
-                                       JOIN build_properties AS revision
-                                         ON revision.buildid = builds.id
-                                        AND revision.name = 'revision'
-                                       JOIN build_properties AS got_revision
-                                         ON got_revision.buildid = builds.id
-                                        AND got_revision.name = 'got_revision'
-                                       JOIN builders
-                                         ON builderid = builders.id
-                                       JOIN workers
-                                         ON workerid = workers.id
-                                        AND workers.name = '{worker}'
-                                  WHERE builds.results = 0
-                                    AND (
-                                            builders.name = 'dbt5'
-                                         OR builders.name LIKE 'dbt5-%'
-                                        )
-                                    AND (
-                                            revision.value = '"{commit}"'
-                                         OR got_revision.value = '"{commit}"'
-                                        )
-                                """
-                        pcmd = ['psql', '-XAt', '-d', 'perffarm', '-c', query]
-                        r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
-                        found = r.stdout.strip()
-
-                        if found == '1':
+                        found = find_test_for_commit('dbt5', worker, commit)
+                        if found:
                             if args.verbose:
                                 print(f'  dbt5: {worker} exists')
                         else:
-                            found = '0'
                             if args.verbose:
                                 print(f'  dbt5: {worker} missed')
                     else:
-                        found = '0'
+                        found = False
                         if args.verbose:
                             print(f'  dbt5: {worker} queue')
 
-                    if not args.dry_run and found == '0':
+                    if not args.dry_run and not found:
                         r = s.post(
                                 f"{args.buildbot}/api/v2/forceschedulers/run-dbt5-{worker}" ,
                                 data=json.dumps(data), headers=headers)
@@ -336,47 +288,19 @@ for branch in args.branch:
 
                 for worker in args.worker:
                     if args.only_missing:
-                        query = f"""
-                                SELECT 1
-                                  FROM builds
-                                       JOIN build_properties AS revision
-                                         ON revision.buildid = builds.id
-                                        AND revision.name = 'revision'
-                                       JOIN build_properties AS got_revision
-                                         ON got_revision.buildid = builds.id
-                                        AND got_revision.name = 'got_revision'
-                                       JOIN builders
-                                         ON builderid = builders.id
-                                       JOIN workers
-                                         ON workerid = workers.id
-                                        AND workers.name = '{worker}'
-                                  WHERE builds.results = 0
-                                    AND (
-                                            builders.name = 'dbt7'
-                                         OR builders.name LIKE 'dbt7-%'
-                                        )
-                                    AND (
-                                            revision.value = '"{commit}"'
-                                         OR got_revision.value = '"{commit}"'
-                                        )
-                                """
-                        pcmd = ['psql', '-XAt', '-d', 'perffarm', '-c', query]
-                        r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
-                        found = r.stdout.strip()
-
-                        if found == '1':
+                        found = find_test_for_commit('dbt7', worker, commit)
+                        if found:
                             if args.verbose:
                                 print(f'  dbt7: {worker} exists')
                         else:
-                            found = '0'
                             if args.verbose:
                                 print(f'  dbt7: {worker} missed')
                     else:
-                        found = '0'
+                        found = False
                         if args.verbose:
                             print(f'  dbt7: {worker} queue')
 
-                    if not args.dry_run and found == '0':
+                    if not args.dry_run and not found:
                         r = s.post(
                                 f"{args.buildbot}/api/v2/forceschedulers/run-dbt7-{worker}" ,
                                 data=json.dumps(data), headers=headers)
