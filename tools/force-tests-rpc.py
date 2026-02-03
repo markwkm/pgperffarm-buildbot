@@ -139,7 +139,8 @@ for branch in args.branch:
                         "duration": 120,
                         "connection_delay": 1,
                         "connections_per_processor": 1,
-                        "terminal_limit": 1
+                        "terminal_limit": 1,
+                        "parallelism": 1,
                         }
 
                 for worker in args.worker:
@@ -202,7 +203,8 @@ for branch in args.branch:
                         "duration": 120,
                         "connection_delay": 1,
                         "connections_per_processor": 1,
-                        "terminal_limit": 1
+                        "terminal_limit": 1,
+                        "parallelism": 1,
                         }
 
                 for worker in args.worker:
@@ -265,6 +267,7 @@ for branch in args.branch:
                         "duration": 120,
                         "connection_delay": 1,
                         "users": 1,
+                        "parallelism": 1,
                         }
 
                 for worker in args.worker:
@@ -327,7 +330,8 @@ for branch in args.branch:
                         "duration": 120,
                         "connection_delay": 1,
                         "connections_per_processor": 1,
-                        "terminal_limit": 1
+                        "terminal_limit": 1,
+                        "parallelism": 1,
                         }
 
                 for worker in args.worker:
