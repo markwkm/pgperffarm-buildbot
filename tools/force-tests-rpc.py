@@ -8,6 +8,44 @@ import json
 import requests
 
 
+PARAMETERS = {
+    "dbt2": {
+        "reason": "force jsonrpc",
+        "warehouses": 1,
+        "duration": 120,
+        "connection_delay": 1,
+        "connections_per_processor": 1,
+        "terminal_limit": 1,
+        "parallelism": 1,
+    },
+    "dbt3": {
+        "reason": "force jsonrpc",
+        "scale": 1,
+        "duration": 120,
+        "connection_delay": 1,
+        "connections_per_processor": 1,
+        "terminal_limit": 1,
+        "parallelism": 1,
+    },
+    "dbt5": {
+        "reason": "force jsonrpc",
+        "customers": 1000,
+        "duration": 120,
+        "connection_delay": 1,
+        "users": 1,
+        "parallelism": 1,
+    },
+    "dbt7": {
+        "reason": "force jsonrpc",
+        "scale": 1,
+        "duration": 120,
+        "connection_delay": 1,
+        "connections_per_processor": 1,
+        "terminal_limit": 1,
+        "parallelism": 1,
+    },
+}
+
 def find_test_for_commit(test0, name, revision):
     """Check if a test has run for a given commit."""
     query = f"""
@@ -26,8 +64,8 @@ def find_test_for_commit(test0, name, revision):
                 AND workers.name = '{name}'
           WHERE builds.results = 0
             AND (
-                    builders.name = '{test}'
-                 OR builders.name LIKE '{test}-%'
+                    builders.name = '{test0}'
+                 OR builders.name LIKE '{test0}-%'
                 )
             AND (
                     revision.value = '"{revision}"'
@@ -87,7 +125,7 @@ parser.add_argument(
 parser.add_argument(
         '--test',
         action='append',
-        default=[],
+        default=None,
         help='test to run (dbt2, dbt3, dbt5, dbt7)',
         )
 parser.add_argument(
@@ -112,6 +150,9 @@ args = parser.parse_args()
 
 if not args.dry_run:
     secret = getpass.getpass('secret: ')
+
+if args.test is None:
+    args.test = ["dbt2", "dbt3", "dbt5", "dbt7"]
 
 headers = {'Content-Type': 'application/json'}
 data = {
@@ -164,145 +205,29 @@ for branch in args.branch:
 
                 print(f'{count}: commit {commit} {message}')
 
-            # dbt2
-            if not args.test or 'dbt2' in args.test:
-                data['params'] = {
-                        "reason": "force jsonrpc",
-                        "revision": commit,
-                        "branch": branch,
-                        "owner": args.user,
-                        "warehouses": 1,
-                        "duration": 120,
-                        "connection_delay": 1,
-                        "connections_per_processor": 1,
-                        "terminal_limit": 1,
-                        "parallelism": 1,
-                        }
+            for test in args.test:
+                data['params'] = PARAMETERS[test].copy()
+                data['params']['revision'] = commit
+                data['params']['branch'] = branch
+                data['params']['owner'] = args.user
 
                 for worker in args.worker:
                     if args.only_missing:
-                        found = find_test_for_commit('dbt2', worker, commit)
+                        found = find_test_for_commit(test, worker, commit)
                         if found:
                             if args.verbose:
-                                print(f'  dbt2: {worker} exists')
+                                print(f'  {test}: {worker} exists')
                         else:
                             if args.verbose:
-                                print(f'  dbt2: {worker} missed')
+                                print(f'  {test}: {worker} missed')
                     else:
                         found = False
                         if args.verbose:
-                            print(f'  dbt2: {worker} queue')
+                            print(f'  {test}: {worker} queue')
 
                     if not args.dry_run and not found:
                         r = s.post(
-                                f"{args.buildbot}/api/v2/forceschedulers/run-dbt2-{worker}" ,
-                                data=json.dumps(data), headers=headers)
-                        if r.status_code < 200 or r.status_code >= 300:
-                            print(r.text)
-
-            # dbt3
-            if not args.test or 'dbt3' in args.test:
-                data['params'] = {
-                        "reason": "force jsonrpc",
-                        "revision": commit,
-                        "branch": branch,
-                        "owner": args.user,
-                        "scale": 1,
-                        "duration": 120,
-                        "connection_delay": 1,
-                        "connections_per_processor": 1,
-                        "terminal_limit": 1,
-                        "parallelism": 1,
-                        }
-
-                for worker in args.worker:
-                    if args.only_missing:
-                        found = find_test_for_commit('dbt3', worker, commit)
-                        if found:
-                            if args.verbose:
-                                print(f'  dbt3: {worker} exists')
-                        else:
-                            if args.verbose:
-                                print(f'  dbt3: {worker} missed')
-                    else:
-                        found = False
-                        if args.verbose:
-                            print(f'  dbt3: {worker} queue')
-
-                    if not args.dry_run and not found:
-                        r = s.post(
-                                f"{args.buildbot}/api/v2/forceschedulers/run-dbt3-{worker}" ,
-                                data=json.dumps(data), headers=headers)
-                        if r.status_code < 200 or r.status_code >= 300:
-                            print(r.text)
-
-            # dbt5
-            if not args.test or 'dbt5' in args.test:
-                data['params'] = {
-                        "reason": "force jsonrpc",
-                        "revision": commit,
-                        "branch": branch,
-                        "owner": args.user,
-                        "customers": 1000,
-                        "duration": 120,
-                        "connection_delay": 1,
-                        "users": 1,
-                        "parallelism": 1,
-                        }
-
-                for worker in args.worker:
-                    if args.only_missing:
-                        found = find_test_for_commit('dbt5', worker, commit)
-                        if found:
-                            if args.verbose:
-                                print(f'  dbt5: {worker} exists')
-                        else:
-                            if args.verbose:
-                                print(f'  dbt5: {worker} missed')
-                    else:
-                        found = False
-                        if args.verbose:
-                            print(f'  dbt5: {worker} queue')
-
-                    if not args.dry_run and not found:
-                        r = s.post(
-                                f"{args.buildbot}/api/v2/forceschedulers/run-dbt5-{worker}" ,
-                                data=json.dumps(data), headers=headers)
-                        if r.status_code < 200 or r.status_code >= 300:
-                            print(r.text)
-
-            # dbt7
-            if not args.test or 'dbt7' in args.test:
-                data['params'] = {
-                        "reason": "force jsonrpc",
-                        "revision": commit,
-                        "branch": branch,
-                        "owner": args.user,
-                        "scale": 1,
-                        "duration": 120,
-                        "connection_delay": 1,
-                        "connections_per_processor": 1,
-                        "terminal_limit": 1,
-                        "parallelism": 1,
-                        }
-
-                for worker in args.worker:
-                    if args.only_missing:
-                        found = find_test_for_commit('dbt7', worker, commit)
-                        if found:
-                            if args.verbose:
-                                print(f'  dbt7: {worker} exists')
-                        else:
-                            if args.verbose:
-                                print(f'  dbt7: {worker} missed')
-                    else:
-                        found = False
-                        if args.verbose:
-                            print(f'  dbt7: {worker} queue')
-
-                    if not args.dry_run and not found:
-                        r = s.post(
-                                f"{args.buildbot}/api/v2/forceschedulers/run-dbt7-{worker}" ,
+                                f"{args.buildbot}/api/v2/forceschedulers/run-{test}-{worker}" ,
                                 data=json.dumps(data), headers=headers)
                         if r.status_code < 200 or r.status_code >= 300:
                             print(r.text)
