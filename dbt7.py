@@ -95,7 +95,7 @@ DBT7STEPS = general.CLEANUP + \
                 '/bin/sh', '-c',
                 util.Interpolate(
                     "dbt7 run "
-                    "-d postgresqlea "
+                    "-d pgsqlea "
                     f"--parallel {PARALLELISM} "
                     "--stats "
                     "--tpcdstools=%(prop:builddir)s/../dsgen "
@@ -116,7 +116,7 @@ DBT7STEPS = general.CLEANUP + \
                 '/bin/sh', '-c',
                 util.Interpolate(
                     "dbt7 run "
-                    "-d postgresqlea "
+                    "-d pgsqlea "
                     "--parallel=%(prop:parallelism)s "
                     "--stats "
                     "--tpcdstools=%(prop:builddir)s/../dsgen "
