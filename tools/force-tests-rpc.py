@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
+"""Script to queue batches of tests."""
 
-import sys
 import subprocess
 import argparse
 import getpass
@@ -166,7 +166,7 @@ if not args.dry_run:
     r = s.get(f"{args.buildbot}/auth/login", auth=(args.user, secret))
 
 if not args.worker:
-    r = requests.get(f"{args.buildbot}/api/v2/workers")
+    r = requests.get(f"{args.buildbot}/api/v2/workers", timeout=60)
     args.worker = worker_names = [worker['name'] for worker in r.json().get('workers', [])]
 
 if args.verbose:
@@ -180,9 +180,9 @@ for branch in args.branch:
         print(f"queueing for branch {branch}")
 
     command = ['git', 'checkout', branch]
-    subprocess.run(command, stdout=subprocess.PIPE, text=True)
+    subprocess.run(command, stdout=subprocess.PIPE, text=True, check=False)
     command = ['git', 'pull']
-    subprocess.run(command, stdout=subprocess.PIPE, text=True)
+    subprocess.run(command, stdout=subprocess.PIPE, text=True, check=False)
 
     command = ['git', 'log']
     if args.limit:
@@ -200,7 +200,8 @@ for branch in args.branch:
             if args.verbose:
                 pcmd = ['git', 'log', '-1', '--pretty=format:"%s - %aD"',
                         '--date=format:"%Y-%m-%d"', commit]
-                r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True)
+                r = subprocess.run(pcmd, stdout=subprocess.PIPE, text=True,
+                                   check=False)
                 message = r.stdout.strip().strip('"')
 
                 print(f'{count}: commit {commit} {message}')
