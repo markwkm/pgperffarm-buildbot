@@ -84,7 +84,7 @@ STATS_DSS = [
             alwaysRun=True,
             ),
         steps.ShellCommand(
-            name="Bock Device Stats",
+            name="Block Device Stats",
             command=[
                 'sh', '-c',
                 util.Interpolate(f"{CATPREFIX}/sar/sar-blockdev.csv"),
@@ -143,7 +143,7 @@ STATS_OLTP = [
             alwaysRun=True,
             ),
         steps.ShellCommand(
-            name="Bock Device Stats",
+            name="Block Device Stats",
             command=[
                 'sh', '-c',
                 util.Interpolate(f"{CATPREFIX}/sar/sar-blockdev.csv"),
