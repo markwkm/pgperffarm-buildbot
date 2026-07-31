@@ -1,10 +1,10 @@
 #!/bin/sh
 
-BUILDBOTURL="http://147.75.56.225:8010"
+BUILDBOTURL="${BUILDBOTURL:-http://147.75.56.225:8010}"
 CSVEXPORT="export-dbt2.csv"
 CSVREPORT="report-dbt2.csv"
 CSVSORTED="sorted-dbt2.csv"
-PGGITDIR="/usr/local/src/postgres"
+PGGITDIR="${PGGITDIR:-/usr/local/src/postgres}"
 PLOTSIZE="1600,1000"
 
 psql -X -d perffarm -o "${CSVEXPORT}" << __SQL__
