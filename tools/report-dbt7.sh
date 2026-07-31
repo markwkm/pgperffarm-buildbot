@@ -116,6 +116,11 @@ for SCALE in ${SCALES}; do
 			awk -F " " "\$1 == \"${PLANT}\" && \$2 == \"${BRANCH}\"" \
 					"${TMPFILESCALE}" >> "${TMPFILE}"
 
+			LINES="$(wc -l "${TMPFILE}" | cut -d " " -f 1)"
+			if [ "${LINES}" -eq 1 ]; then
+				continue
+			fi
+
 			COUNT=$(( COUNT + 1 ))
 			if [ ${COUNT} -gt 1 ]; then
 				PLOTLIST="${PLOTLIST},"
@@ -146,6 +151,10 @@ for SCALE in ${SCALES}; do
 				plot ${LINES}
 			__PLOT__
 		}
+
+		if [ -z "${PLOTLIST}" ]; then
+			continue
+		fi
 
 		plot "" "" "Queries / Hour" "${PLOTLIST}"
 	done

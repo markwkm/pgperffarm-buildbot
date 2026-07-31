@@ -117,12 +117,21 @@ for SCALE in ${SCALES}; do
 			awk -F " " "\$1 == \"${PLANT}\" && \$2 == \"${BRANCH}\"" \
 					"${TMPFILESCALE}" >> "${TMPFILE}"
 
+			LINES="$(wc -l "${TMPFILE}" | cut -d " " -f 1)"
+			if [ "${LINES}" -eq 1 ]; then
+				continue
+			fi
+
 			COUNT=$(( COUNT + 1 ))
 			if [ ${COUNT} -gt 1 ]; then
 				PLOTLIST="${PLOTLIST},"
 			fi
 			PLOTLIST="${PLOTLIST}'${TMPFILE}' using 'ctime':'metric' title '${BRANCH}' noenhanced with linespoints"
 		done
+
+		if [ -z "${PLOTLIST}" ]; then
+			continue
+		fi
 
 		gnuplot <<- __PLOT__
 			set xdata time

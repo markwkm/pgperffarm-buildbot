@@ -136,6 +136,10 @@ for SCALE in ${SCALES}; do
 			PLOTLIST="${PLOTLIST}'${TMPFILE}' using 'ctime':'metric' title '${BRANCH}' noenhanced with linespoints"
 		done
 
+		if [ -z "${PLOTLIST}" ]; then
+			continue
+		fi
+
 		gnuplot <<- __PLOT__
 			set xdata time
 			set timefmt "%s"
