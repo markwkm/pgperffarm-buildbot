@@ -29,10 +29,6 @@ DBT7PROPERTIES = [
         general.PROPERTIES
 
 DBT7STEPS = general.CLEANUP + \
-        [steps.RemoveDirectory(
-            name="Remove previous dsgen files",
-            dir=util.Interpolate("%(prop:builddir)s/load"),
-            )] + \
         postgres.PGINSTALL + \
         [steps.Compile(
             name="Install auto_explain extension",
