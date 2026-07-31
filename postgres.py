@@ -25,8 +25,9 @@ PGINITDB = [
             command=[
                 '/bin/sh', '-c',
                 util.Interpolate(
-                        "cat "
-                        "%(prop:builddir)s/../guc/$(echo %(prop:buildername)s | cut -d '-' -f 1).%(prop:branch:~master)s.conf "
+                        "cat %(prop:builddir)s/../guc/"
+                        "$(echo %(prop:buildername)s | cut -d '-' -f 1)"
+                        ".%(prop:branch:~master)s.conf"
                         " >> %(prop:builddir)s/pgdata/postgresql.auto.conf"
                         ),
                 ],

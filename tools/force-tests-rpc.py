@@ -187,8 +187,8 @@ for branch in args.branch:
 
     command = ['git', 'fetch', '-q', 'origin',
                f'+refs/heads/{branch}:refs/heads/{branch}']
-    result = subprocess.run(command, text=True, check=False)
-    if result.returncode != 0:
+    fetched = subprocess.run(command, text=True, check=False)
+    if fetched.returncode != 0:
         print(f'WARNING: could not update branch {branch}, using local ref')
 
     command = ['git', 'log']
