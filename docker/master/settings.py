@@ -23,6 +23,9 @@ BUILDERS = {
 
 BUILDBOT_URL = os.environ.get('BUILDBOT_URL', 'http://localhost:8010/')
 
+# Do not report usage data from throwaway test containers.
+BUILDBOT_NET_USAGE_DATA = None
+
 DB_URL = "sqlite:///state.sqlite"
 
 # Empty by default so bringing the stack up does not fetch all of
