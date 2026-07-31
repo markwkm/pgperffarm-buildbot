@@ -41,7 +41,10 @@ CLEANUP = [
             ),
         ]
 
-PATCHDBT = [
+def patchdbt(workdir):
+    '''Return the steps for applying a patch to the DBT kit checked out
+    in workdir.'''
+    return [
         steps.ShellCommand(
             name="Apply DBT kit patch",
             doStepIf=lambda step: step.build.getProperties(). \
@@ -55,7 +58,7 @@ PATCHDBT = [
                     ),
                 ],
             haltOnFailure=True,
-            workdir=util.Interpolate("%(prop:buildername)s"),
+            workdir=workdir,
             )
         ]
 

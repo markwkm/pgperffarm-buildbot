@@ -68,7 +68,7 @@ DBT2STEPS = general.CLEANUP + \
             branch='main',
             alwaysUseLatest=True,
             )] + \
-        general.PATCHDBT + \
+        general.patchdbt('dbt2') + \
         [steps.Configure(
             name="Configure DBT-2",
             command=[

@@ -50,7 +50,7 @@ DBT3STEPS = general.CLEANUP + \
             alwaysUseLatest=True,
             haltOnFailure=True,
             )] + \
-        general.PATCHDBT + \
+        general.patchdbt('dbt3') + \
         [steps.Configure(
             name="Configure DBT-3",
             command=[
