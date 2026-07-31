@@ -98,6 +98,9 @@ tail -n +2 "${CSVEXPORT}" | while IFS= read -r LINE; do
 		WAREHOUSES="${SCALE}"
 	fi
 
+	NOTPM="${NOTPM:-NULL}"
+	WAREHOUSES="${WAREHOUSES:-NULL}"
+
 	echo "${LINE} ${CTIME} ${NOTPM} ${WAREHOUSES}" >> "${CSVREPORT}"
 done
 

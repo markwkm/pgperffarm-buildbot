@@ -92,6 +92,9 @@ tail -n +2 "${CSVEXPORT}" | while IFS= read -r LINE; do
 		SF="${SCALE}"
 	fi
 
+	SCORE="${SCORE:-NULL}"
+	SF="${SF:-NULL}"
+
 	echo "${LINE} ${CTIME} ${SCORE} ${SF}" >> "${CSVREPORT}"
 done
 

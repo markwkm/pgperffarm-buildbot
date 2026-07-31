@@ -114,6 +114,12 @@ tail -n +2 "${CSVEXPORT}" | while IFS= read -r LINE; do
 		SF="${SCALE}"
 	fi
 
+	SCORE="${SCORE:-NULL}"
+	SF="${SF:-NULL}"
+	LOAD="${LOAD:-NULL}"
+	POWER="${POWER:-NULL}"
+	THROUGHPUT="${THROUGHPUT:-NULL}"
+
 	echo "${LINE} ${CTIME} ${SCORE} ${SF} ${LOAD} ${POWER} ${THROUGHPUT}" >> \
 			"${CSVREPORT}"
 done

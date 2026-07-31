@@ -91,6 +91,9 @@ tail -n +2 "${CSVEXPORT}" | while IFS= read -r LINE; do
 		CUSTOMERS="${SCALE}"
 	fi
 
+	TRTPS="${TRTPS:-NULL}"
+	CUSTOMERS="${CUSTOMERS:-NULL}"
+
 	echo "${LINE} ${CTIME} ${TRTPS} ${CUSTOMERS}" >> "${CSVREPORT}"
 done
 
