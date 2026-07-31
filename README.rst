@@ -12,6 +12,71 @@ The goals of this project include:
 4. Submit patches directly to Buildbot for testing
 5. Allow Buildbot worker specific test parameters
 
+--------------------------------------
+Initiating tests from the command line
+--------------------------------------
+
+The force schedulers can be driven over the JSON-RPC API with
+``tools/force-tests-rpc.py``.  It walks a PostgreSQL git repository
+and queues a build for each commit that touches ``src/``, so tests can
+be queued against a series of commits, one branch at a time.  Run it
+from inside a clone of postgres.git::
+
+    git clone --bare https://github.com/postgres/postgres.git
+    cd postgres.git
+    /path/to/pgperffarm-buildbot/tools/force-tests-rpc.py \
+        --buildbot http://localhost:8010 \
+        --user admin@example.com \
+        --branch master \
+        --limit 1 \
+        --test dbt2 \
+        --worker worker1
+
+The script prompts for the Buildbot login secret before queueing.
+Repeat ``--branch``, ``--test``, and ``--worker`` to cover more
+combinations; omitting ``--worker`` queues tests on every registered
+worker.  Use ``--dry-run`` to preview what would be queued, and
+``--only-missing`` to skip commits that already have a successful
+result recorded in the perffarm database (requires ``psql`` access to
+it).
+
+--------------------------
+Submitting a patch to test
+--------------------------
+
+Each test's force dialog accepts three optional file uploads:
+PostgreSQL configuration overrides, a patch to apply to PostgreSQL,
+and a patch to apply to the DBT kit.  The patches must be base64
+encoded::
+
+    base64 fix.patch > fix.patch.b64
+
+In the web interface, open the builder for the wanted test and worker
+combination (e.g. ``dbt2-worker1``), press the force button, and
+upload the encoded patch in the appropriate field.
+
+The same parameters can be supplied through the JSON-RPC API.  Log in
+first to get a session cookie, then POST a force request with the
+patch inline (``tr`` strips the newlines that JSON strings cannot
+carry)::
+
+    curl -s -c cookies.txt -u admin@example.com \
+        http://localhost:8010/auth/login
+    curl -s -b cookies.txt -H 'Content-Type: application/json' \
+        --data @- \
+        http://localhost:8010/api/v2/forceschedulers/run-dbt2-worker1 \
+        <<EOF
+    {"jsonrpc": "2.0", "method": "force", "id": 1, "params": {
+        "reason": "testing fix.patch",
+        "warehouses": 1,
+        "duration": 120,
+        "connection_delay": 1,
+        "connections_per_processor": 1,
+        "parallelism": 20,
+        "terminal_limit": 1000,
+        "postgresql.patch": "$(base64 fix.patch | tr -d '\n')"}}
+    EOF
+
 ---------------------------
 Testing with Docker Compose
 ---------------------------
