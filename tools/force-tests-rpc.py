@@ -167,7 +167,9 @@ data = {
 
 s = requests.Session()
 if not args.dry_run:
-    r = s.get(f"{args.buildbot}/auth/login", auth=(args.user, secret))
+    r = s.get(f"{args.buildbot}/auth/login", auth=(args.user, secret),
+              timeout=60)
+    r.raise_for_status()
 
 if not args.worker:
     r = requests.get(f"{args.buildbot}/api/v2/workers", timeout=60)
@@ -232,8 +234,9 @@ for branch in args.branch:
 
                     if not args.dry_run and not found:
                         r = s.post(
-                                f"{args.buildbot}/api/v2/forceschedulers/run-{test}-{worker}" ,
-                                data=json.dumps(data), headers=headers)
+                                f"{args.buildbot}/api/v2/forceschedulers/run-{test}-{worker}",
+                                data=json.dumps(data), headers=headers,
+                                timeout=60)
                         if r.status_code < 200 or r.status_code >= 300:
                             print(r.text)
 
