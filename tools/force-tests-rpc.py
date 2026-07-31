@@ -48,7 +48,7 @@ PARAMETERS = {
 
 def find_test_for_commit(test0, name, revision):
     """Check if a test has run for a given commit."""
-    query = f"""
+    query = """
         SELECT 1
           FROM builds
                JOIN build_properties AS revision
@@ -61,19 +61,23 @@ def find_test_for_commit(test0, name, revision):
                  ON builderid = builders.id
                JOIN workers
                  ON workerid = workers.id
-                AND workers.name = '{name}'
+                AND workers.name = :'worker'
           WHERE builds.results = 0
             AND (
-                    builders.name = '{test0}'
-                 OR builders.name LIKE '{test0}-%'
+                    builders.name = :'test'
+                 OR builders.name LIKE :'test' || '-%'
                 )
             AND (
-                    revision.value = '"{revision}"'
-                 OR got_revision.value = '"{revision}"'
+                    revision.value = '"' || :'revision' || '"'
+                 OR got_revision.value = '"' || :'revision' || '"'
                 )
     """
     result = subprocess.run(
-        ['psql', '-XAt', '-d', 'perffarm', '-c', query],
+        ['psql', '-XAt', '-d', 'perffarm',
+         '-v', f'test={test0}',
+         '-v', f'worker={name}',
+         '-v', f'revision={revision}'],
+        input=query,
         stdout=subprocess.PIPE,
         text=True,
         check=False,
