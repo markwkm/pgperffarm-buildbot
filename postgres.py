@@ -4,6 +4,8 @@ These are common steps specific for PostgreSQL.
 
 from buildbot.plugins import steps, util
 
+import general
+
 PGINITDB = [
         steps.ShellCommand(
             name="Initialize postgres instance",
@@ -30,15 +32,20 @@ PGINITDB = [
                 ],
             haltOnFailure=True,
             ),
+        steps.StringDownload(
+            util.Interpolate("%(prop:custom_postgresql.conf)s"),
+            name="Transfer custom GUC overrides",
+            doStepIf=general.hasproperty("custom_postgresql.conf"),
+            haltOnFailure=True,
+            workerdest="../custom_postgresql.conf",
+            ),
         steps.ShellCommand(
             name="Add custom GUC overrides",
-            doStepIf=lambda step: step.build.getProperties(). \
-                    hasProperty("custom_postgresql.conf") and \
-                    step.build.getProperty("custom_postgresql.conf"),
+            doStepIf=general.hasproperty("custom_postgresql.conf"),
             command=[
                 '/bin/sh', '-c',
                 util.Interpolate(
-                        "echo \"%(prop:custom_postgresql.conf)s\" "
+                        "cat %(prop:builddir)s/custom_postgresql.conf"
                         " >> %(prop:builddir)s/pgdata/postgresql.auto.conf"
                         ),
                 ],
@@ -55,17 +62,19 @@ PGINSTALL = [
             method='fresh',
             haltOnFailure=True,
             ),
+        steps.StringDownload(
+            util.Interpolate("%(prop:postgresql.patch)s"),
+            name="Transfer PostgreSQL patch",
+            doStepIf=general.hasproperty("postgresql.patch"),
+            haltOnFailure=True,
+            workerdest="../postgresql.patch",
+            ),
         steps.ShellCommand(
             name="Apply PostgreSQL patch",
-            doStepIf=lambda step: step.build.getProperties(). \
-                    hasProperty("postgresql.patch") and \
-                    step.build.getProperty("postgresql.patch"),
+            doStepIf=general.hasproperty("postgresql.patch"),
             command=[
                 '/bin/sh', '-c',
-                util.Interpolate(
-                    "echo \"%(prop:postgresql.patch)s\" > ../postgresql.patch && "
-                    "base64 -d ../postgresql.patch | patch -p1"
-                    ),
+                'base64 -d ../postgresql.patch | patch -p1',
                 ],
             haltOnFailure=True,
             ),

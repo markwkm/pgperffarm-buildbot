@@ -41,25 +41,35 @@ CLEANUP = [
             ),
         ]
 
+def hasproperty(name):
+    '''Return a doStepIf callable that checks whether the given build
+    property is set and not empty.'''
+    def check(step):
+        return bool(step.build.getProperty(name, ""))
+    return check
+
 def patchdbt(workdir):
     '''Return the steps for applying a patch to the DBT kit checked out
     in workdir.'''
     return [
+        steps.StringDownload(
+            util.Interpolate("%(prop:dbt.patch)s"),
+            name="Transfer DBT kit patch",
+            doStepIf=hasproperty("dbt.patch"),
+            haltOnFailure=True,
+            workerdest="../dbt.patch",
+            workdir=workdir,
+            ),
         steps.ShellCommand(
             name="Apply DBT kit patch",
-            doStepIf=lambda step: step.build.getProperties(). \
-                    hasProperty("dbt.patch") and \
-                    step.build.getProperty("dbt.patch"),
+            doStepIf=hasproperty("dbt.patch"),
             command=[
                 'sh', '-c',
-                util.Interpolate(
-                    "echo \"%(prop:dbt.patch)s\" > ../dbt.patch && "
-                    "base64 -d ../dbt.patch | patch -p1"
-                    ),
+                'base64 -d ../dbt.patch | patch -p1',
                 ],
             haltOnFailure=True,
             workdir=workdir,
-            )
+            ),
         ]
 
 STATS_SYSTEM = [
