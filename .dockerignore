@@ -1,0 +1,9 @@
+.git
+*.pyc
+*.sw?
+CLAUDE.md
+http.log
+settings.py
+state.sqlite
+twistd.log
+twistd.pid

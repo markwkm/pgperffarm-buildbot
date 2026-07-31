@@ -1,0 +1,48 @@
+# Docker Compose test environment: one Buildbot master built from this
+# repository and two workers built from the pgperffarm-worker
+# repository.  See the "Testing with Docker Compose" section in
+# README.rst.
+
+services:
+  master:
+    build:
+      context: .
+      dockerfile: docker/master/Dockerfile
+    environment:
+      BUILDBOT_ADMIN: admin@example.com
+      BUILDBOT_ADMIN_PASSWORD: admin
+      BUILDBOT_URL: http://localhost:8010/
+      # Tests attached to every worker; only dbt2 runs without the
+      # non-redistributable TPC tools.
+      TESTS: dbt2
+      WORKER_NAMES: worker1 worker2
+      WORKER_PASSWORD: secret
+      # Empty disables the git poller so starting the environment does
+      # not fetch all of postgres.git; set it to
+      # https://github.com/postgres/postgres.git to exercise polling.
+      POLL_REPO: ""
+    ports:
+      - "8010:8010"
+
+  worker1:
+    build: &worker-build
+      context: docker/worker
+      args:
+        WORKER_REF: main
+    environment:
+      BUILDMASTER_HOST: master
+      WORKER_NAME: worker1
+      WORKER_PASSWORD: secret
+    depends_on:
+      - master
+    shm_size: 1gb
+
+  worker2:
+    build: *worker-build
+    environment:
+      BUILDMASTER_HOST: master
+      WORKER_NAME: worker2
+      WORKER_PASSWORD: secret
+    depends_on:
+      - master
+    shm_size: 1gb
