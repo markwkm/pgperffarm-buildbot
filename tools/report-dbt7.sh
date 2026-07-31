@@ -162,4 +162,6 @@ for SCALE in ${SCALES}; do
 	done
 done
 
-echo "${TMPFILELIST}" | xargs rm
+if [ -n "${TMPFILELIST}" ]; then
+	echo "${TMPFILELIST}" | xargs rm
+fi
