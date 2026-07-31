@@ -152,7 +152,7 @@ DBT3STEPS = general.CLEANUP + \
         general.STATS_SYSTEM + \
         general.STATS_DSS
 
-for i in range(1, 22):
+for i in range(1, 23):
     DBT3STEPS.append(
             steps.ShellCommand(
                 name=f"Power Query {i}",
