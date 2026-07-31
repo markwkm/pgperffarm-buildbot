@@ -182,6 +182,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX}/sar/sar-blockdev.csv"),
                 ],
             alwaysRun=True,
+            warnOnFailure=True,
             ),
         steps.ShellCommand(
             name="CPU Stats",
@@ -189,6 +190,7 @@ STATS_OLTP = [
                 'sh', '-c', util.Interpolate(f"{CATPREFIX}/sar/sar-cpu.csv"),
                 ],
             alwaysRun=True,
+            warnOnFailure=True,
             ),
         steps.ShellCommand(
             name="Memory Stats",
@@ -196,6 +198,7 @@ STATS_OLTP = [
                 'sh', '-c', util.Interpolate(f"{CATPREFIX}/sar/sar-mem.csv"),
                 ],
             alwaysRun=True,
+            warnOnFailure=True,
             ),
         steps.ShellCommand(
             name="Network Stats",
@@ -203,6 +206,7 @@ STATS_OLTP = [
                 'sh', '-c', util.Interpolate(f"{CATPREFIX}/sar/sar-net.csv"),
                 ],
             alwaysRun=True,
+            warnOnFailure=True,
             ),
         steps.ShellCommand(
             name="Paging Stats",
@@ -211,6 +215,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX}/sar/sar-paging.csv"),
                 ],
             alwaysRun=True,
+            warnOnFailure=True,
             ),
         steps.ShellCommand(
             name="Swapping Stats",
@@ -218,6 +223,7 @@ STATS_OLTP = [
                 'sh', '-c', util.Interpolate(f"{CATPREFIX}/sar/sar-swap.csv"),
                 ],
             alwaysRun=True,
+            warnOnFailure=True,
             ),
         ]
 
