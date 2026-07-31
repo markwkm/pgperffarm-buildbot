@@ -1,0 +1,3 @@
+buildbot
+buildbot-www
+requests
