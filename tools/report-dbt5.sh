@@ -109,7 +109,6 @@ for SCALE in ${SCALES}; do
 	for PLANT in ${PLANTS}; do
 		COUNT=0
 		PLOTLIST=""
-		TMPFILELIST=""
 		for BRANCH in ${BRANCHES}; do
 			TMPFILE="$(mktemp)"
 			TMPFILELIST="${TMPFILELIST} ${TMPFILE}"
