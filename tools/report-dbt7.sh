@@ -68,11 +68,11 @@ TO STDOUT
 (FORMAT csv, HEADER TRUE, DELIMITER ' ', NULL 'NULL');
 __SQL__
 
-HEADER="$(head -n 1 "${CSVEXPORT}") ctime metric"
+HEADER="$(head -n 1 "${CSVEXPORT}") ctime metric sf"
 
 (cd "${PGGITDIR}" && git fetch -q --all && git pull -q)
 
-echo "${HEADER} " > "${CSVREPORT}"
+echo "${HEADER}" > "${CSVREPORT}"
 tail -n +2 "${CSVEXPORT}" | while IFS= read -r LINE; do
 	COMMIT="$(echo "${LINE}" | cut -d " " -f 3)"
 	SCALE="$(echo "${LINE}" | cut -d " " -f 4)"
@@ -82,10 +82,12 @@ tail -n +2 "${CSVEXPORT}" | while IFS= read -r LINE; do
 
 	SUMMARY="$(curl --silent "${BUILDBOTURL}/api/v2/logs/${LOGSUMMARY}/raw_inline")"
 	SCORE="$(echo "${SUMMARY}"| \
-			sed -n 's/.*Queries per Hour:[ ]\+\([0-9]\+\?\).*/\1/p')"
+			sed -n \
+			's/.*Queries per Hour:[ ]\+\([0-9]\+\(\.[0-9]\+\)\?\).*/\1/p')"
 
 	if [ "${SCALE}" = "NULL" ]; then
-		SF="$(echo "${SUMMARY}"| sed -n 's/.*Scale:[ ]\+\([0-9]\+\?\).*/\1/p')"
+		SF="$(echo "${SUMMARY}"| sed -n \
+				's/.*Scale:[ ]\+\([0-9]\+\(\.[0-9]\+\)\?\).*/\1/p')"
 	else
 		SF="${SCALE}"
 	fi
