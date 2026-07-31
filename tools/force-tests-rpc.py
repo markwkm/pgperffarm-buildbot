@@ -83,7 +83,7 @@ def find_test_for_commit(test0, name, revision):
 
 parser = argparse.ArgumentParser(
         description="""
-        Queue up performance tests to run.  Must run this script from withing a
+        Queue up performance tests to run.  Must run this script from within a
         PostgreSQL git repository:
         git clone --bare https://github.com/postgres/postgres.git
         """
@@ -179,23 +179,23 @@ for branch in args.branch:
     if args.verbose:
         print(f"queueing for branch {branch}")
 
-    command = ['git', 'checkout', branch]
-    subprocess.run(command, stdout=subprocess.PIPE, text=True, check=False)
-    command = ['git', 'pull']
-    subprocess.run(command, stdout=subprocess.PIPE, text=True, check=False)
+    command = ['git', 'fetch', '-q', 'origin',
+               f'+refs/heads/{branch}:refs/heads/{branch}']
+    result = subprocess.run(command, text=True, check=False)
+    if result.returncode != 0:
+        print(f'WARNING: could not update branch {branch}, using local ref')
 
     command = ['git', 'log']
     if args.limit:
         command.append(f'-{args.limit}')
-    command.append('--pretty=format:"%H"')
-    if args.revision:
-        command.append(args.revision)
+    command.append('--pretty=format:%H')
+    command.append(args.revision if args.revision else branch)
     command.extend(['--', 'src'])
 
     with subprocess.Popen(command, stdout=subprocess.PIPE, text=True) as pipe:
         count = 1
         for line in pipe.stdout:
-            commit = line.strip().strip('"')
+            commit = line.strip()
 
             if args.verbose:
                 pcmd = ['git', 'log', '-1', '--pretty=format:"%s - %aD"',
