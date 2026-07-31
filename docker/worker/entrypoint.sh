@@ -16,4 +16,7 @@ EOF
 touch twistd.log
 tail -n +1 -F twistd.log &
 
-exec twistd --nodaemon --pidfile= --python=buildbot.tac
+# Use buildbot-worker start rather than twistd directly: it puts the
+# worker directory on sys.path, which the settings import in
+# buildbot.tac depends on.
+exec buildbot-worker start --nodaemon .
