@@ -183,7 +183,8 @@ DBT2STEPS = general.CLEANUP + \
                 '/bin/sh', '-c',
                 util.Interpolate(
                     "dbt2 run --stats "
-                    "--connection-delay $(( %(prop:connection_delay)s * 1000 )) "
+                    "--connection-delay "
+                    "$(( %(prop:connection_delay)s * 1000 )) "
                     "--connections-per-processor %(prop:connections_per_processor)s "
                     "--duration %(prop:duration)s "
                     "--terminal-limit %(prop:terminal_limit)s "

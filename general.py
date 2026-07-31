@@ -123,7 +123,8 @@ STATS_DSS = [
         steps.ShellCommand(
             name="CPU Stats",
             command=[
-                'sh', '-c', util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-cpu.csv"),
+                'sh', '-c',
+                util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-cpu.csv"),
                 ],
             alwaysRun=True,
             warnOnFailure=True,
@@ -131,7 +132,8 @@ STATS_DSS = [
         steps.ShellCommand(
             name="Memory Stats",
             command=[
-                'sh', '-c', util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-mem.csv"),
+                'sh', '-c',
+                util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-mem.csv"),
                 ],
             alwaysRun=True,
             warnOnFailure=True,
@@ -139,7 +141,8 @@ STATS_DSS = [
         steps.ShellCommand(
             name="Network Stats",
             command=[
-                'sh', '-c', util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-net.csv"),
+                'sh', '-c',
+                util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-net.csv"),
                 ],
             alwaysRun=True,
             warnOnFailure=True,
@@ -156,7 +159,8 @@ STATS_DSS = [
         steps.ShellCommand(
             name="Swapping Stats",
             command=[
-                'sh', '-c', util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-swap.csv"),
+                'sh', '-c',
+                util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-swap.csv"),
                 ],
             alwaysRun=True,
             warnOnFailure=True,
@@ -197,7 +201,8 @@ STATS_OLTP = [
         steps.ShellCommand(
             name="CPU Stats",
             command=[
-                'sh', '-c', util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-cpu.csv"),
+                'sh', '-c',
+                util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-cpu.csv"),
                 ],
             alwaysRun=True,
             warnOnFailure=True,
@@ -205,7 +210,8 @@ STATS_OLTP = [
         steps.ShellCommand(
             name="Memory Stats",
             command=[
-                'sh', '-c', util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-mem.csv"),
+                'sh', '-c',
+                util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-mem.csv"),
                 ],
             alwaysRun=True,
             warnOnFailure=True,
@@ -213,7 +219,8 @@ STATS_OLTP = [
         steps.ShellCommand(
             name="Network Stats",
             command=[
-                'sh', '-c', util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-net.csv"),
+                'sh', '-c',
+                util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-net.csv"),
                 ],
             alwaysRun=True,
             warnOnFailure=True,
@@ -230,7 +237,8 @@ STATS_OLTP = [
         steps.ShellCommand(
             name="Swapping Stats",
             command=[
-                'sh', '-c', util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-swap.csv"),
+                'sh', '-c',
+                util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-swap.csv"),
                 ],
             alwaysRun=True,
             warnOnFailure=True,
