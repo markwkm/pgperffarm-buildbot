@@ -99,6 +99,7 @@ STATS_DSS = [
                 util.Interpolate(f"{CATPREFIX_DSS}/pidstat.txt || exit 0"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -109,6 +110,7 @@ STATS_DSS = [
                 util.Interpolate(f"{CATPREFIX_DSS}/spar.txt || exit 0"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -118,6 +120,7 @@ STATS_DSS = [
                 util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-blockdev.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -127,6 +130,7 @@ STATS_DSS = [
                 util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-cpu.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -136,6 +140,7 @@ STATS_DSS = [
                 util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-mem.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -145,6 +150,7 @@ STATS_DSS = [
                 util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-net.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -154,6 +160,7 @@ STATS_DSS = [
                 util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-paging.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -163,6 +170,7 @@ STATS_DSS = [
                 util.Interpolate(f"{CATPREFIX_DSS}/sar/sar-swap.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         ]
@@ -177,6 +185,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX_OLTP}/pidstat.txt || exit 0"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -187,6 +196,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX_OLTP}/spar.txt || exit 0"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -196,6 +206,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-blockdev.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -205,6 +216,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-cpu.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -214,6 +226,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-mem.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -223,6 +236,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-net.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -232,6 +246,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-paging.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         steps.ShellCommand(
@@ -241,6 +256,7 @@ STATS_OLTP = [
                 util.Interpolate(f"{CATPREFIX_OLTP}/sar/sar-swap.csv"),
                 ],
             alwaysRun=True,
+            flunkOnFailure=False,
             warnOnFailure=True,
             ),
         ]
