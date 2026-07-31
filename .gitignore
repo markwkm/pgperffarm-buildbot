@@ -5,6 +5,6 @@ state.sqlite
 
 # buildbot
 http.log
-settings.py
+/settings.py
 twistd.log
 twistd.pid
