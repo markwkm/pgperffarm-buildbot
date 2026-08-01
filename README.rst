@@ -97,8 +97,24 @@ schedulers can be used after logging in as *admin@example.com* with
 password *admin*.  See ``compose.yaml`` for all of the defaults.
 
 Each build clones and compiles PostgreSQL from source, so the first
-build on each worker takes a while.  The git poller is disabled by
-default so that starting the environment does not fetch all of
-postgres.git; set *POLL_REPO* to enable polling a repository.  The
-worker image's *WORKER_REF* build argument pins the pgperffarm-worker
-revision being tested.
+build on each worker takes a while.  The worker image's *WORKER_REF*
+build argument pins the pgperffarm-worker revision being tested.
+
+Testing the git poller
+~~~~~~~~~~~~~~~~~~~~~~
+
+The master image bakes a clone of postgres.git into ``/poll-repo``
+with ``refs/heads/master`` pinned to the *POLL_BASELINE* build
+argument, and the master polls it (see *POLL_REPO* and
+*POLL_INTERVAL* in ``compose.yaml``).  Because the clone contains
+history past the baseline, tests can advance the branch through real
+commits with ``git update-ref`` and no network access::
+
+    sh docker/test-poller.sh
+
+The script advances master to a commit that does not touch ``src/``
+and verifies that no build is triggered, then to a commit that does
+and verifies that one is.  Since the commits are real postgres.git
+commits, the triggered build can run to completion.  Note the poller
+copies the repository into its own working directory on the first
+poll after the master container is created.
