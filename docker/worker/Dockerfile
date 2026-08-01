@@ -13,7 +13,9 @@ RUN apt-get update \
                 gcc \
                 git \
                 libev-dev \
+                libpq-dev \
                 libreadline-dev \
+                libsqlite3-dev \
                 locales \
                 make \
                 perl \
@@ -21,6 +23,7 @@ RUN apt-get update \
                 procps \
                 python3 \
                 python3-venv \
+                sqlite3 \
                 sysstat \
                 zlib1g-dev \
         && rm -rf /var/lib/apt/lists/* \
