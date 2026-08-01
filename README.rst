@@ -132,3 +132,28 @@ waits for both builds to finish, and checks that each build's
 got_revision property records the requested revision.  The two
 builds compile PostgreSQL in parallel, so expect the script to run
 for as long as the slower build.
+
+Testing patch submission
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+To verify the force upload parameters, run::
+
+    sh docker/test-patch.sh
+
+The script forces a dbt2 build on worker1 that carries a PostgreSQL
+patch, a DBT kit patch, and a ``work_mem`` override, then verifies
+that both patches applied and that the override shows up in the
+captured ``pg_settings`` output.
+
+Running the whole suite
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To go from nothing to a fully validated environment with one
+command, run::
+
+    sh docker/test-all.sh
+
+It builds the images, starts the environment, waits for the workers
+to connect, runs all of the test scripts, and waits for every
+triggered build to finish.  Expect several PostgreSQL builds' worth
+of run time.
