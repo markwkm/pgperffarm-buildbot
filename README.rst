@@ -118,3 +118,17 @@ and verifies that one is.  Since the commits are real postgres.git
 commits, the triggered build can run to completion.  Note the poller
 copies the repository into its own working directory on the first
 poll after the master container is created.
+
+Testing forced revisions
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+To verify that forced builds test the requested commit, run::
+
+    sh docker/test-force.sh
+
+The script forces dbt2 builds of two specific revisions, the pinned
+baseline on worker1 and the poller test's ``src/`` commit on worker2,
+waits for both builds to finish, and checks that each build's
+got_revision property records the requested revision.  The two
+builds compile PostgreSQL in parallel, so expect the script to run
+for as long as the slower build.
