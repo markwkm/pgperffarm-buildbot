@@ -18,6 +18,7 @@ RUN apt-get update \
                 libsqlite3-dev \
                 locales \
                 make \
+                patch \
                 perl \
                 pkg-config \
                 procps \
