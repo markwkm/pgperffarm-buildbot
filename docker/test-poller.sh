@@ -5,18 +5,13 @@
 # from the top of this repository while the compose environment is up.
 set -e
 
-BUILDBOTURL="${BUILDBOTURL:-http://localhost:8010}"
 # Seconds to wait for the poller to notice a ref move.
 POLLWAIT="${POLLWAIT:-120}"
 
+# shellcheck source=docker/testlib.sh
+. ./docker/testlib.sh
 # shellcheck source=docker/fixture.sh
 . ./docker/fixture.sh
-
-count()
-{
-	curl -s "${BUILDBOTURL}/api/v2/${1}" | python3 -c \
-	"import json, sys; print(json.load(sys.stdin)['meta']['total'])"
-}
 
 advance()
 {
