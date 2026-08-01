@@ -57,7 +57,6 @@ DBT2PROPERTIES = [
         general.PROPERTIES
 
 DBT2STEPS = general.CLEANUP + \
-        postgres.PGINSTALL + \
         [steps.Git(
             name="Clone DBT-2",
             repourl='https://github.com/osdldbt/dbt2.git',
@@ -69,6 +68,7 @@ DBT2STEPS = general.CLEANUP + \
             alwaysUseLatest=True,
             )] + \
         general.patchdbt('dbt2') + \
+        postgres.PGINSTALL + \
         [steps.Configure(
             name="Configure DBT-2",
             command=[

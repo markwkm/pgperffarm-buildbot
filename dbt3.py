@@ -29,13 +29,6 @@ DBT3PROPERTIES = [
         general.PROPERTIES
 
 DBT3STEPS = general.CLEANUP + \
-        postgres.PGINSTALL + \
-        [steps.Compile(
-            name="Install auto_explain extension",
-            command=['make', 'install'],
-            workdir='build/contrib/auto_explain',
-            haltOnFailure=True,
-            )] + \
         [steps.Git(
             name="Clone DBT-3",
             repourl='https://github.com/osdldbt/dbt3.git',
@@ -47,6 +40,13 @@ DBT3STEPS = general.CLEANUP + \
             haltOnFailure=True,
             )] + \
         general.patchdbt('dbt3') + \
+        postgres.PGINSTALL + \
+        [steps.Compile(
+            name="Install auto_explain extension",
+            command=['make', 'install'],
+            workdir='build/contrib/auto_explain',
+            haltOnFailure=True,
+            )] + \
         [steps.Configure(
             name="Configure DBT-3",
             command=[

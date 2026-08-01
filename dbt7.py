@@ -29,13 +29,6 @@ DBT7PROPERTIES = [
         general.PROPERTIES
 
 DBT7STEPS = general.CLEANUP + \
-        postgres.PGINSTALL + \
-        [steps.Compile(
-            name="Install auto_explain extension",
-            command=['make', 'install'],
-            workdir='build/contrib/auto_explain',
-            haltOnFailure=True,
-            )] + \
         [steps.Git(
             name="Clone DBT-7",
             repourl='https://github.com/osdldbt/dbt7.git',
@@ -47,6 +40,13 @@ DBT7STEPS = general.CLEANUP + \
             haltOnFailure=True,
             )] + \
         general.patchdbt('dbt7') + \
+        postgres.PGINSTALL + \
+        [steps.Compile(
+            name="Install auto_explain extension",
+            command=['make', 'install'],
+            workdir='build/contrib/auto_explain',
+            haltOnFailure=True,
+            )] + \
         [steps.Configure(
             name="Configure DBT-7",
             command=[

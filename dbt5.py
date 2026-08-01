@@ -50,7 +50,6 @@ DBT5PROPERTIES = [
         general.PROPERTIES
 
 DBT5STEPS = general.CLEANUP + \
-        postgres.PGINSTALL + \
         [steps.Git(
             name="Clone DBT-5",
             repourl='https://github.com/osdldbt/dbt5.git',
@@ -62,6 +61,7 @@ DBT5STEPS = general.CLEANUP + \
             haltOnFailure=True,
             )] + \
         general.patchdbt('dbt5') + \
+        postgres.PGINSTALL + \
         [steps.Configure(
             name="Configure DBT-5",
             command=[
