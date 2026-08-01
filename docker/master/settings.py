@@ -28,9 +28,11 @@ BUILDBOT_NET_USAGE_DATA = None
 
 DB_URL = "sqlite:///state.sqlite"
 
-# Empty by default so bringing the stack up does not fetch all of
-# postgres.git; use the force schedulers, or set POLL_REPO to poll.
-POLL_REPO = os.environ.get('POLL_REPO', '')
+# Poll the pinned repository baked into the image; set POLL_REPO
+# empty to disable polling, or point it somewhere else.
+POLL_REPO = os.environ.get('POLL_REPO', 'file:///poll-repo')
+
+POLL_INTERVAL = int(os.environ.get('POLL_INTERVAL', '30'))
 
 WORKERS = [
     worker.Worker(name, workerPassword, max_builds=1)

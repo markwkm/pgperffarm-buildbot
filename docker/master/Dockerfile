@@ -7,6 +7,18 @@ RUN apt-get update \
 
 RUN useradd --create-home buildbot
 
+# Bake a clone of postgres.git pinned to a baseline commit for
+# exercising the git poller.  Tests advance refs/heads/master through
+# commits that are already in the pack, so no network access is needed
+# at test time.  See docker/test-poller.sh.
+ARG POSTGRES_REPO=https://github.com/postgres/postgres.git
+ARG POLL_BASELINE=85df8c5bc7fe271bd17ffa1b84b972fabf964d40
+RUN git clone --bare --single-branch --branch master --no-tags \
+                "${POSTGRES_REPO}" /poll-repo \
+        && git -C /poll-repo update-ref refs/heads/master \
+                "${POLL_BASELINE}" \
+        && chown -R buildbot:buildbot /poll-repo
+
 WORKDIR /home/buildbot/master
 
 COPY requirements.txt ./

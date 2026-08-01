@@ -17,10 +17,12 @@ services:
       TESTS: dbt2
       WORKER_NAMES: worker1 worker2
       WORKER_PASSWORD: secret
-      # Empty disables the git poller so starting the environment does
-      # not fetch all of postgres.git; set it to
-      # https://github.com/postgres/postgres.git to exercise polling.
-      POLL_REPO: ""
+      # The master image bakes a clone of postgres.git at /poll-repo,
+      # pinned to a baseline commit, for testing the poller with
+      # docker/test-poller.sh.  Set POLL_REPO empty to disable
+      # polling, or point it at another repository.
+      POLL_REPO: file:///poll-repo
+      POLL_INTERVAL: "30"
     ports:
       - "8010:8010"
 
