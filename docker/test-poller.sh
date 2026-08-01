@@ -9,12 +9,15 @@ BUILDBOTURL="${BUILDBOTURL:-http://localhost:8010}"
 # Seconds to wait for the poller to notice a ref move.
 POLLWAIT="${POLLWAIT:-120}"
 
-# Commits on postgres.git master following the baked baseline
-# 85df8c5bc7f (see POLL_BASELINE in docker/master/Dockerfile):
+# The pinned baseline; keep in sync with POLL_BASELINE in
+# docker/master/Dockerfile.
+BASELINE="85df8c5bc7fe271bd17ffa1b84b972fabf964d40"
+
+# Consecutive commits on postgres.git master following the baseline:
 # touches only doc/src/sgml/, and must not trigger a build.
 COMMIT_DOC="78758d37306cd89ab060f00cb06f249018d5b8da"
-# Adds files under src/test/examples/, and must trigger a build.
-COMMIT_SRC="20c3d9dd4883fc27735c7de777afca4f03c7a492"
+# Touches src/backend/ and src/include/, and must trigger a build.
+COMMIT_SRC="e65c331b8fbf8c9632b62c5a9dcb589cbd3046a8"
 
 count()
 {
@@ -41,6 +44,12 @@ wait_for_changes()
 	echo "FAIL: timed out waiting for change ${1} to be recorded"
 	exit 1
 }
+
+echo "resetting master to the baseline ${BASELINE}"
+advance "${BASELINE}"
+# The rewind emits no change; give the poller one cycle to record the
+# new head so that the following moves are diffed against it.
+sleep 45
 
 CHANGES0="$(count changes)"
 REQUESTS0="$(count buildrequests)"
