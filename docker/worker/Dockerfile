@@ -23,6 +23,7 @@ RUN apt-get update \
                 procps \
                 python3 \
                 python3-venv \
+                rsync \
                 sqlite3 \
                 sysstat \
                 zlib1g-dev \
@@ -35,6 +36,17 @@ ENV LANG=en_US.UTF-8
 RUN python3 -m venv /opt/buildbot \
         && /opt/buildbot/bin/pip install --no-cache-dir buildbot-worker
 ENV PATH="/opt/buildbot/bin:${PATH}"
+
+# The touchstone tools provide the ts command the DBT kits use to
+# collect system and database statistics during a test.
+ARG TOUCHSTONE_REF=main
+RUN git clone https://gitlab.com/touchstone/touchstone-tools.git \
+                /tmp/touchstone-tools \
+        && git -C /tmp/touchstone-tools checkout "${TOUCHSTONE_REF}" \
+        && cmake -S /tmp/touchstone-tools -B /tmp/touchstone-tools/build \
+        && cmake --build /tmp/touchstone-tools/build \
+        && cmake --install /tmp/touchstone-tools/build \
+        && rm -rf /tmp/touchstone-tools
 
 RUN useradd --create-home buildbot
 
