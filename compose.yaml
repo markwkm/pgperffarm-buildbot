@@ -23,8 +23,12 @@ services:
       # polling, or point it at another repository.
       POLL_REPO: file:///poll-repo
       POLL_INTERVAL: "30"
+      # Credentials for submitting patches with "buildbot try".
+      TRY_USER: try
+      TRY_PASSWORD: try
     ports:
       - "8010:8010"
+      - "8031:8031"
 
   worker1:
     build: &worker-build

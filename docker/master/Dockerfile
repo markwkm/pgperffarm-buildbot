@@ -33,6 +33,6 @@ RUN chown -R buildbot:buildbot /home/buildbot/master
 
 USER buildbot
 
-EXPOSE 8010 9989
+EXPOSE 8010 8031 9989
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

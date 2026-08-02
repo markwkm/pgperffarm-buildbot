@@ -26,6 +26,13 @@ BUILDBOT_URL = os.environ.get('BUILDBOT_URL', 'http://localhost:8010/')
 # Do not report usage data from throwaway test containers.
 BUILDBOT_NET_USAGE_DATA = None
 
+TRY_PORT = int(os.environ.get('TRY_PORT', '8031'))
+
+TRY_USERS = [
+    (os.environ.get('TRY_USER', 'try'),
+     os.environ.get('TRY_PASSWORD', 'try')),
+    ]
+
 DB_URL = "sqlite:///state.sqlite"
 
 # Poll the pinned repository baked into the image; set POLL_REPO
