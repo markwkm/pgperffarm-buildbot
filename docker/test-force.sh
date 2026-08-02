@@ -13,6 +13,8 @@ set -e
 # shellcheck source=docker/fixture.sh
 . ./docker/fixture.sh
 
+wait_api
+
 bb_login
 
 # Queue a forced dbt2 build of a revision on a worker and print the

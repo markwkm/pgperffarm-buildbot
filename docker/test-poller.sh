@@ -13,6 +13,8 @@ POLLWAIT="${POLLWAIT:-120}"
 # shellcheck source=docker/fixture.sh
 . ./docker/fixture.sh
 
+wait_api
+
 advance()
 {
 	docker compose exec -T master \

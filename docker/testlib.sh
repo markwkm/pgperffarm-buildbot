@@ -19,10 +19,29 @@ bb_login()
 			"${BUILDBOTURL}/auth/login" > /dev/null
 }
 
+# Wait for the master API to start answering; the master takes a
+# little while to come up after the container starts.
+wait_api()
+{
+	SECONDS_WAITED=0
+	until curl -sf "${BUILDBOTURL}/api/v2/builds" > /dev/null 2>&1; do
+		if [ "${SECONDS_WAITED}" -ge 120 ]; then
+			echo "FAIL: no Buildbot API at ${BUILDBOTURL}"
+			exit 1
+		fi
+		sleep 5
+		SECONDS_WAITED=$(( SECONDS_WAITED + 5 ))
+	done
+}
+
 # Print the total number of records of an API collection.
 count()
 {
-	curl -s "${BUILDBOTURL}/api/v2/${1}" | python3 -c \
+	RESPONSE="$(curl -sf "${BUILDBOTURL}/api/v2/${1}")" || {
+		echo "FAIL: cannot reach ${BUILDBOTURL}/api/v2/${1}" >&2
+		exit 1
+	}
+	printf '%s\n' "${RESPONSE}" | python3 -c \
 	"import json, sys; print(json.load(sys.stdin)['meta']['total'])"
 }
 

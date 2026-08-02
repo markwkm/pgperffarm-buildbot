@@ -9,6 +9,8 @@ set -e
 # shellcheck source=docker/testlib.sh
 . ./docker/testlib.sh
 
+wait_api
+
 cat > "${TESTTMP}/postgresql.patch" <<'EOF'
 --- /dev/null
 +++ b/PGPERFFARM_PATCH_TEST.txt

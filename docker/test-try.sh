@@ -14,6 +14,8 @@ set -e
 # shellcheck source=docker/fixture.sh
 . ./docker/fixture.sh
 
+wait_api
+
 TRY_USER="${TRY_USER:-try}"
 TRY_PASSWORD="${TRY_PASSWORD:-try}"
 
