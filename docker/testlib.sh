@@ -37,7 +37,7 @@ for step in json.load(sys.stdin)['steps']:
         break"
 }
 
-# Print the first log of the named step of a build.
+# Print all logs of the named step of a build.
 step_log()
 {
 	python3 - "${BUILDBOTURL}" "${1}" "${2}" <<'PYEOF'
@@ -51,9 +51,11 @@ with urllib.request.urlopen(f"{url}/api/v2/builds/{buildid}/steps") as f:
 step = next(s for s in steps if s['name'] == name)
 with urllib.request.urlopen(
         f"{url}/api/v2/steps/{step['stepid']}/logs") as f:
-    logid = json.load(f)['logs'][0]['logid']
-with urllib.request.urlopen(f"{url}/api/v2/logs/{logid}/raw_inline") as f:
-    sys.stdout.write(f.read().decode())
+    logs = json.load(f)['logs']
+for log in logs:
+    with urllib.request.urlopen(
+            f"{url}/api/v2/logs/{log['logid']}/raw_inline") as f:
+        sys.stdout.write(f.read().decode())
 PYEOF
 }
 

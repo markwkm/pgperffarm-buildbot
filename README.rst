@@ -55,9 +55,25 @@ In the web interface, open the builder for the wanted test and worker
 combination (e.g. ``dbt2-worker1``), press the force button, and
 upload the encoded patch in the appropriate field.
 
-The same parameters can be supplied through the JSON-RPC API.  Log in
-first to get a session cookie, then POST a force request with the
-patch inline (``tr`` strips the newlines that JSON strings cannot
+When the master enables it with *TRY_USERS* (see
+``settings.py.sample``), a PostgreSQL patch can also be submitted
+with Buildbot's own try command, which applies the plain, unencoded
+diff to the requested revision during checkout::
+
+    buildbot try --connect=pb --master=<master>:8031 \
+        --username=developer --passwd=password \
+        --who=developer \
+        --branch=master --baserev=<commit> \
+        --diff=fix.patch --patchlevel=1 \
+        --builder=dbt2-worker1
+
+A try build reads its test parameters from the worker's test
+configuration files, like a polled build, and the patch applies only
+to PostgreSQL, not to the DBT kit.
+
+The force parameters can also be supplied through the JSON-RPC API.
+Log in first to get a session cookie, then POST a force request with
+the patch inline (``tr`` strips the newlines that JSON strings cannot
 carry)::
 
     curl -s -c cookies.txt -u admin@example.com \
@@ -144,6 +160,19 @@ The script forces a dbt2 build on worker1 that carries a PostgreSQL
 patch, a DBT kit patch, and a ``work_mem`` override, then verifies
 that both patches applied and that the override shows up in the
 captured ``pg_settings`` output.
+
+Testing buildbot try
+~~~~~~~~~~~~~~~~~~~~
+
+To verify patch submission with Buildbot's try command, run::
+
+    sh docker/test-try.sh
+
+The script submits a patch that creates a file under ``src/``
+against a pinned PostgreSQL revision, running the try client inside
+the master container, and verifies that the requested revision was
+checked out, that the source step applied the patch, and that the
+build read its parameters from the worker's test configuration.
 
 Running the whole suite
 ~~~~~~~~~~~~~~~~~~~~~~~

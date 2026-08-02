@@ -35,6 +35,7 @@ echo "workers connected"
 
 sh docker/test-force.sh
 sh docker/test-patch.sh
+sh docker/test-try.sh
 sh docker/test-poller.sh
 
 # The poller test only asserts that a build was triggered; wait for
