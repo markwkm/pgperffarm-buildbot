@@ -63,6 +63,7 @@ diff to the requested revision during checkout::
     buildbot try --connect=pb --master=<master>:8031 \
         --username=developer --passwd=password \
         --who=developer \
+        --repository=https://github.com/postgres/postgres.git \
         --branch=master --baserev=<commit> \
         --diff=fix.patch --patchlevel=1 \
         --builder=dbt2-worker1

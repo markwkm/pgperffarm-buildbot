@@ -40,6 +40,7 @@ docker compose exec -T master buildbot try \
 		--username="${TRY_USER}" \
 		--passwd="${TRY_PASSWORD}" \
 		--who="docker test environment" \
+		--repository=https://github.com/postgres/postgres.git \
 		--branch=master \
 		--baserev="${COMMIT_SRC}" \
 		--diff=/tmp/try.patch \
