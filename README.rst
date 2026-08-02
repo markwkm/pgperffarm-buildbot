@@ -55,23 +55,6 @@ In the web interface, open the builder for the wanted test and worker
 combination (e.g. ``dbt2-worker1``), press the force button, and
 upload the encoded patch in the appropriate field.
 
-When the master enables it with *TRY_USERS* (see
-``settings.py.sample``), a PostgreSQL patch can also be submitted
-with Buildbot's own try command, which applies the plain, unencoded
-diff to the requested revision during checkout::
-
-    buildbot try --connect=pb --master=<master>:8031 \
-        --username=developer --passwd=password \
-        --who=developer \
-        --repository=https://github.com/postgres/postgres.git \
-        --branch=master --baserev=<commit> \
-        --diff=fix.patch --patchlevel=1 \
-        --builder=dbt2-worker1
-
-A try build reads its test parameters from the worker's test
-configuration files, like a polled build, and the patch applies only
-to PostgreSQL, not to the DBT kit.
-
 The force parameters can also be supplied through the JSON-RPC API.
 Log in first to get a session cookie, then POST a force request with
 the patch inline (``tr`` strips the newlines that JSON strings cannot
@@ -93,6 +76,53 @@ carry)::
         "terminal_limit": 1000,
         "postgresql.patch": "$(base64 fix.patch | tr -d '\n')"}}
     EOF
+
+------------------------------------
+Submitting a patch with buildbot try
+------------------------------------
+
+When the master enables it with *TRY_USERS* (see
+``settings.py.sample``), Buildbot's own try command can submit a
+plain, unencoded PostgreSQL patch, which the source step applies to
+the requested revision during checkout.  The try client is part of
+Buildbot itself, so on the submitting machine::
+
+    pip install buildbot
+
+Any unified diff can be submitted directly.  Pick the test and
+worker with ``--builder``, which may be repeated::
+
+    git diff > fix.patch
+    buildbot try --connect=pb --master=<master>:8031 \
+        --username=developer --passwd=password \
+        --who=developer \
+        --repository=https://github.com/postgres/postgres.git \
+        --branch=master --baserev=<commit> \
+        --diff=fix.patch --patchlevel=1 \
+        --builder=dbt2-worker1
+
+Alternatively, run from inside a PostgreSQL working tree with
+``--vc=git`` and try works out the branch, base revision, and diff
+from the uncommitted changes by itself::
+
+    buildbot try --connect=pb --master=<master>:8031 \
+        --username=developer --passwd=password \
+        --who=developer \
+        --repository=https://github.com/postgres/postgres.git \
+        --vc=git \
+        --builder=dbt2-worker1
+
+Either way, the base revision must exist in the repository the
+workers clone from, so base local work on a pushed PostgreSQL
+commit.  ``--get-builder-names`` lists the builders that accept try
+jobs, and ``--wait`` keeps the client attached until the build
+finishes.
+
+A try build reads its test parameters from the worker's test
+configuration files, like a polled build, and the patch applies
+only to PostgreSQL, not to the DBT kit.  To also patch the DBT kit
+or change PostgreSQL configuration parameters, use the force
+schedulers described in the previous section.
 
 ---------------------------
 Testing with Docker Compose
